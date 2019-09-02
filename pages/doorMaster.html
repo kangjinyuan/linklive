@@ -1,0 +1,89 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">门禁设备管理</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有门禁设备哦</div>
+					</div>
+				</div>
+				<div class="matrix-box door-master-matrix-box" v-else>
+					<div class="matrix-list-box" v-for="t in dataList">
+						<div class="matrix-list-inner-box box-shadow">
+							<div class="img-box">
+								<img src="../img/door-master.jpg" />
+							</div>
+							<div class="matrix-content-box">
+								<div class="matrix-content-text-box">
+									<div class="matrix-title-text" v-bind:title="t.deviceName">{{t.deviceName}}</div>
+									<div v-bind:class="['matrix-type',t.status == 0?'matrix-type-disabled':'']">{{t.statusText}}</div>
+								</div>
+								<div class="matrix-content-text-box">设备序列号：{{t.deviceSn}}</div>
+								<div class="matrix-content-text-box">设备类别：{{t.typeText}}</div>
+								<div class="matrix-content-text-box" v-if="t.type == 2">设备归属地：小区</div>
+								<div class="matrix-content-text-box" v-if="t.type == 3">设备归属地：{{t.buildingCode}}号楼{{t.unit}}单元</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadPage();
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page
+			};
+			request('POST', '/facility/doorMaster/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i].type == 2) {
+						dataList[i].typeText = "小区设备";
+					} else if(dataList[i].type == 3) {
+						dataList[i].typeText = "单元设备";
+					}
+					if(dataList[i].status == 0) {
+						dataList[i].statusText = "离线";
+					} else if(dataList[i].status == 1) {
+						dataList[i].statusText = "在线";
+					}
+				}
+				setData.dataList = dataList;
+			}, function() {
+				layer.msg("门禁设备加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

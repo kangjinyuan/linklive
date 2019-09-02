@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title></title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/address.js"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="address-box">
+				<div class="address-edit-list">
+					<div class="address-edit-list-name">收货人</div>
+					<div class="address-edit-list-value">
+						<input type="text" name="" value="" id="name" placeholder="请输入收货人" />
+					</div>
+				</div>
+				<div class="address-edit-list">
+					<div class="address-edit-list-name">手机号</div>
+					<div class="address-edit-list-value">
+						<input type="number" name="" value="" id="telephone" placeholder="请输入手机号" />
+					</div>
+				</div>
+				<div class="address-edit-list">
+					<div class="select-area-value" onclick="showDom('select-area-box');">
+						<div class="address-edit-list-value full-input">
+							<div v-if="province && city && county">{{province}},{{city}},{{county}}</div>
+							<input v-else type="text" name="" readonly="readonly" value="" placeholder="省、市、区" />
+						</div>
+						<div class="more"></div>
+					</div>
+				</div>
+				<div class="address-edit-list">
+					<div class="address-edit-list-value full-input">
+						<input type="text" name="" value="" id="address" placeholder="详细地址，如街道、楼栋门牌号" />
+					</div>
+				</div>
+				<div class="big-btn" onclick="save();">保存并使用</div>
+			</div>
+			<div class="select-area-box hide-box">
+				<div class="select-area">
+					<div class="select-area-title">
+						<ul class="area-box">
+							<li class="selected" onclick="tabArea(this);">{{province?province:'请选择'}}</li>
+							<li v-if="province" onclick="tabArea(this);">{{city?city:'请选择'}}</li>
+							<li v-if="city" onclick="tabArea(this);">{{county?county:'请选择'}}</li>
+						</ul>
+						<div class="close" onclick="showDom('select-area-box');"></div>
+					</div>
+					<div class="select-area-con">
+						<ul>
+							<li v-bind:class="province.active?'selected':''" v-for="province in areaList" onclick="getArea(0,this);">{{province.value}}</li>
+						</ul>
+						<ul>
+							<li v-bind:class="city.active?'selected':''" v-for="city in cityList" onclick="getArea(1,this);">{{city.value}}</li>
+						</ul>
+						<ul>
+							<li v-bind:class="county.active?'selected':''" v-for="county in countyList" onclick="getArea(2,this);">{{county.value}}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var id = getQueryString("id");
+		param.province = "";
+		param.city = "";
+		param.county = "";
+		param.areaList = [];
+		param.cityList = [];
+		param.countyList = [];
+		loadVue(param);
+
+		function del() {
+			delOneData(id, "确定删除该收货地址？", function(param) {
+				request('POST', '/account/address/delete.do', param, true, function(res) {
+					goBack(-1);
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		function save() {
+			if($("#name").val() == "") {
+				layer.msg("请填写收货人");
+				return false;
+			}
+			if($("#telephone").val() == "") {
+				layer.msg("请填写手机号");
+				return false;
+			}
+			if(!regular_phone.test($("#telephone").val())) {
+				layer.msg("手机号格式错误");
+				return false;
+			}
+			if(setData.province == "" || setData.city == "" || setData.county == "") {
+				layer.msg("请填写省市区");
+				return false;
+			}
+			if($("#address").val() == "") {
+				layer.msg("请填写详细地址");
+				return false;
+			}
+			var param = {
+				id: id,
+				name: $("#name").val(),
+				telephone: $("#telephone").val(),
+				province: setData.province,
+				city: setData.city,
+				county: setData.county,
+				address: $("#address").val(),
+				isDefault: "1"
+			}
+			request('POST', '/account/address/saveOrUpdate.do', param, true, function(res) {
+				goBack(-2);
+			}, function(res) {
+				if(id) {
+					layer.msg("修改失败，请检查网络或重试");
+				} else {
+					layer.msg("添加失败，请检查网络或重试");
+				}
+			})
+		}
+
+		function loadAddressInfo() {
+			if(id) {
+				$("title").text("编辑收货地址");
+				var param = {
+					id: id
+				}
+				request('POST', '/account/address/queryList.do', param, true, function(res) {
+					var addressInfo = res.data[0];
+					$("#name").val(addressInfo.name);
+					$("#telephone").val(addressInfo.telephone);
+					$("#province").val(addressInfo.province);
+					$("#city").val(addressInfo.city);
+					$("#county").val(addressInfo.county);
+					$("#address").val(addressInfo.address);
+					setData.isDefault = addressInfo.isDefault;
+					setArea(addressInfo.province, addressInfo.city, addressInfo.county);
+					jsToApp("0", ["2"]);
+				}, function(res) {
+					layer.msg("地址详情加载失败，请检查网络或重试");
+				})
+			} else {
+				$("title").text("新增收货地址");
+				setArea();
+			}
+		}
+
+		function appToJs(data) {
+			getAppData(data);
+		}
+
+		loadAddressInfo();
+	</script>
+
+</html>

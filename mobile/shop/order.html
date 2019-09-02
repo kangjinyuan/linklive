@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>我的订单</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/photoloadinit.js"></script>
+		<script src="../../js/photoload.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<ul class="order-tab">
+				<li v-for="t in tabList" v-on:click="tab(t.state)">
+					<div v-bind:class="['text',state == t.state? 'selectedColor':'']">{{t.name}}</div>
+					<div v-if="state == t.state" class="selected"></div>
+				</li>
+			</ul>
+			<div class="full-box" v-if="dataList.length == 0">
+				<div class="no-data-box">
+					<div class="icon icon-pay"></div>
+					<div class="text">暂时没有订单哦</div>
+				</div>
+			</div>
+			<div class="order-list-box" v-else>
+				<div class="order-list" v-for="order in dataList">
+					<div class="order-type-box">
+						<div class="order-time">{{order.createTime | resetTime(3)}}</div>
+						<div class="order-type">{{order.stateText}}</div>
+					</div>
+					<div class="list-box" v-on:click="orderSkipPage(0,order);">
+						<div class="list" v-for="shop in order.orderItemList">
+							<div class="list-con">
+								<div class="pay-shop-img">
+									<img v-bind:src="shop.image" onerror="this.src='../../img/no-img.png'" />
+								</div>
+								<div class="pay-shop-info">
+									<div class="pay-shop-title">{{shop.commodityName}}</div>
+									<div class="pay-shop-rule"><span v-for="combination in shop.combinationList">{{combination}}</span></div>
+									<div class="pay-shop-num">
+										<div class="price">￥{{shop.price}}</div>
+										<div class="num"><span>X</span>{{shop.quantity}}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="total-fee" v-if="order.state == 0">需支付:<span><span>￥</span>{{order.totalFee}}</span>(免运费)</div>
+					<div class="total-fee" v-else-if="order.state == 5 || order.state == 6">合计:<span><span>￥</span>{{order.totalFee}}</span>(免运费)</div>
+					<div class="total-fee" v-else>实付:<span><span>￥</span>{{order.totalFee}}</span>(免运费)</div>
+					<ul class="opera-box">
+						<li v-if="order.state == 3" v-on:click="orderSkipPage(1,order);">评价</li>
+						<li v-if="order.state == 0" v-on:click="orderSkipPage(2,order);">去支付</li>
+						<li v-if="order.state == 2" v-on:click="confirmOrder(order.id);">确认收货</li>
+						<li v-if="order.state == 0 || order.state == 1" v-on:click="cancelOrder(order.id);">取消订单</li>
+					</ul>
+				</div>
+				<div class='no-more-box' v-if="currentPage == totalPage && totalPage > 1">没有更多了</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			getScrollTop();
+		})
+		param.tabList = [{
+			state: "",
+			name: '全部'
+		}, {
+			state: "0",
+			name: '待付款'
+		}, {
+			state: "2",
+			name: '待收货'
+		}, {
+			state: "3",
+			name: '待评价'
+		}, {
+			state: "5",
+			name: '已取消'
+		}]
+		param.state = "";
+		loadVue(param);
+
+		function tab(state) {
+			sessionStorage.setItem("scrollTop", "0");
+			setData.state = state;
+			jsToApp("4", state);
+			var data = {
+				state: state
+			}
+			loadData(data);
+		}
+
+		function loadData(res) {
+			page = 1;
+			var state = res.state;
+			setData.state = state;
+			var param = {
+				page: page,
+				state: state
+			}
+			request('POST', '/shop/order/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i].state == 0) {
+						dataList[i].stateText = "待付款";
+					} else if(dataList[i].state == 1) {
+						dataList[i].stateText = "待发货";
+					} else if(dataList[i].state == 2) {
+						dataList[i].stateText = "待收货";
+					} else if(dataList[i].state == 3) {
+						dataList[i].stateText = "待评价";
+					} else if(dataList[i].state == 4) {
+						dataList[i].stateText = "已评价";
+					} else if(dataList[i].state == 5) {
+						dataList[i].stateText = "已取消";
+					} else if(dataList[i].state == 6) {
+						dataList[i].stateText = "已关闭"
+					}
+					dataList[i].totalFee = parseFloat(dataList[i].totalFee).toFixed(2);
+					for(var j = 0; j < dataList[i].orderItemList.length; j++) {
+						var orderItemInfo = dataList[i].orderItemList[j];
+						orderItemInfo.image = imgUrl + orderItemInfo.image;
+						orderItemInfo.combinationList = orderItemInfo.combination.split(" ");
+						orderItemInfo.price = parseFloat(orderItemInfo.price).toFixed(2);
+					}
+				}
+				setData.dataList = dataList;
+				setScrollTop();
+			}, function(res) {
+				layer.msg("订单加载失败，请检查网络或重试");
+			})
+		}
+
+		function loadMore() {
+			scrollpage($(".order-list-box"), function() {
+				var state = setData.state;
+				var param = {
+					page: page,
+					state: state
+				}
+				var oldlist = setData.dataList;
+				request('POST', '/shop/order/queryList.do', param, true, function(res) {
+					var dataList = res.data;
+					for(var i = 0; i < dataList.length; i++) {
+						if(dataList[i].state == 0) {
+							dataList[i].stateText = "待付款";
+						} else if(dataList[i].state == 1) {
+							dataList[i].stateText = "待发货";
+						} else if(dataList[i].state == 2) {
+							dataList[i].stateText = "待收货";
+						} else if(dataList[i].state == 3) {
+							dataList[i].stateText = "待评价";
+						} else if(dataList[i].state == 4) {
+							dataList[i].stateText = "已评价";
+						} else if(dataList[i].state == 5) {
+							dataList[i].stateText = "已取消";
+						} else if(dataList[i].state == 6) {
+							dataList[i].stateText = "已关闭"
+						}
+						dataList[i].totalFee = parseFloat(dataList[i].totalFee).toFixed(2);
+						for(var j = 0; j < dataList[i].orderItemList.length; j++) {
+							var orderItemInfo = dataList[i].orderItemList[j];
+							orderItemInfo.image = imgUrl + orderItemInfo.image;
+							orderItemInfo.combinationList = orderItemInfo.combination.split(" ");
+							orderItemInfo.price = parseFloat(orderItemInfo.price).toFixed(2);
+						}
+						oldlist.push(dataList[i]);
+					}
+					setData.dataList = oldlist;
+				}, function(res) {
+					layer.msg("订单加载失败，请检查网络或重试");
+				})
+			})
+		}
+
+		function appToJs(data) {
+			getAppData(data);
+		}
+	</script>
+
+</html>

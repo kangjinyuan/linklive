@@ -1,0 +1,295 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<input type="hidden" id="cardNo" />
+			<div class="kjy-title">员工管理</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">员工姓名：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="name" placeholder="输入员工姓名" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">职称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="title" placeholder="输入职称" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">性别：</div>
+						<div class="search-value">
+							<select name="" id="gender" onchange="sreach();">
+								<option value="">==请选择性别==</option>
+								<option value="0">男</option>
+								<option value="1">女</option>
+							</select>
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">所属部门：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="departmentName" placeholder="输入部门名称" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div v-if="departmentList.length > 0" class="btn icon icon-add" onclick="showStuff(0,'','新建员工');">新建员工</div>
+				<div class="btn icon icon-del" onclick="del();">删除</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有员工哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<tr>
+								<th class="padding20">
+									<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+								<th>头像</th>
+								<th>员工姓名</th>
+								<th>员工工号</th>
+								<th>性别</th>
+								<th>手机号</th>
+								<th>所属部门</th>
+								<th>职称</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<tr v-for="(t,i) in dataList">
+								<td class="padding20">
+									<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>
+									<div class="head-img">
+										<img v-bind:src="t.headimage" v-bind:alt="t.headimage" onerror="this.src='../img/no-img.png'" />
+									</div>
+								</td>
+								<td>{{t.name}}</td>
+								<td>{{t.code?t.code:'暂无员工工号'}}</td>
+								<td>{{t.genderText}}</td>
+								<td>{{t.telephone}}</td>
+								<td>{{t.departmentName}}</td>
+								<td>{{t.title?t.title:'暂无职称'}}</td>
+								<td>
+									<div class="btn icon icon-edit" v-on:click="showStuff(1,t,'编辑员工')">编辑</div>
+									<div class="btn icon icon-card" v-on:click="showDoorMasterCard(t,'员工制卡-'+t.name);">制卡</div>
+									<div class="btn icon icon-reload" v-on:click="resetPassword(t)">重置密码</div>
+									<!--<div class="btn icon icon-privillege" v-on:click="showmjqx(t,'门禁权限');">门禁权限</div>-->
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		param.departmentList = [];
+		loadPage();
+
+		//		同步员工权限
+		function updateDutyScope(flag, obj, callback) {
+			var timestamp = new Date().getTime();
+			$.getJSON('../json/privillege_stuff.json?timestamp=' + timestamp, function(res) {
+				var d1 = res;
+				$.getJSON('../json/privillege_function_stuff.json?timestamp=' + timestamp, function(res) {
+					var p1 = res;
+					if(flag == 0) {
+						callback(d1, p1);
+					} else {
+						if(obj.dutyScope) {
+							var d2 = JSON.parse(obj.dutyScope);
+							for(var i = 0; i < d1.length; i++) {
+								d1[i].checked = false;
+								for(var j = 0; j < d2.length; j++) {
+									if(d1[i].id == d2[j].id && d1[i].checked != d2[j].checked) {
+										d1[i].checked = d2[j].checked;
+									}
+								}
+							}
+						}
+						if(obj.privilege) {
+							var p2 = JSON.parse(obj.privilege);
+							for(var i = 0; i < p1.length; i++) {
+								p1[i].checked = false;
+								for(var j = 0; j < p2.length; j++) {
+									if(p1[i].id == p2[j].id && p1[i].checked != p2[j].checked) {
+										p1[i].checked = p2[j].checked;
+									}
+								}
+							}
+						}
+						var param = {
+							id: obj.id,
+							name: obj.name,
+							gender: obj.gender,
+							telephone: obj.telephone,
+							departmentId: obj.departmentId,
+							departmentName: obj.departmentName,
+							title: obj.title,
+							dutyScope: JSON.stringify(d1),
+							privilege: JSON.stringify(p1)
+						};
+						request('POST', '/account/stuff/saveOrUpdate.do', param, true, function(res) {
+							callback(d1, p1);
+						}, function() {
+							layer.msg('职责范围同步失败，请检查网络或重试');
+						})
+					}
+				})
+			});
+		}
+
+		function showDoorMasterCard(obj, title) {
+			openMask(obj.id, "../part/setDoorMasterCard", title, "340px", "130px", function(layerDom, layerIframe) {
+				layerIframe[0].contentWindow.loadStuff(obj);
+			})
+		}
+
+		//新建或编辑
+		function showStuff(flag, obj, title) {
+			updateDutyScope(flag, obj, function(dutyScope, privilege) {
+				var timestamp = new Date().getTime();
+				openMask(obj.id, "../part/stuff", title, "660px", "460px", function(layerDom, layerIframe) {
+					layerIframe[0].contentWindow.uploadImgInit(function() {
+						layerIframe[0].contentWindow.loadDutyScope(dutyScope, privilege, function() {
+							layerDom.find("#ygimg").siblings("img").attr("src", obj.headimage + "?timestamp=" + timestamp);
+							layerDom.find("#name").val(obj.name);
+							layerDom.find("#code").val(obj.code);
+							layerDom.find("#gender").val(obj.gender);
+							layerDom.find("#telephone").val(obj.telephone);
+							layerDom.find("#idNo").val(obj.idNo);
+							layerDom.find("#lbsDeviceSn").val(obj.lbsDeviceSn);
+							layerDom.find("#departmentId").val(obj.departmentId);
+							layerDom.find("#departmentName").val(obj.departmentName);
+							layerDom.find("#parentId").val(obj.parentId);
+							layerDom.find("#parentName").val(obj.parentName);
+							if(obj.title == "物业管家") {
+								layerDom.find("#isbutler").val("1");
+								layerDom.find("#title").attr("disabled", "disabled");
+							} else {
+								layerDom.find("#isbutler").val("0");
+							}
+							layerDom.find("#title").val(obj.title);
+							judeEdit(flag, layerDom);
+						})
+					})
+				})
+			})
+		}
+
+		//重置密码
+		function resetPassword(obj) {
+			var param = {
+				id: obj.id,
+				name: obj.name,
+				gender: obj.gender,
+				telephone: obj.telephone,
+				departmentId: obj.departmentId,
+				departmentName: obj.departmentName,
+				title: obj.title,
+				dutyScope: obj.dutyScope,
+				password: '123456'
+			};
+			request('POST', '/account/stuff/saveOrUpdate.do', param, true, function(res) {
+				layer.msg('重置成功，请用初始密码登录员工端');
+			}, function(res) {
+				layer.msg('重置失败，请检查网络或重试');
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选员工？", function(param) {
+				request('POST', '/account/stuff/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				name: $("#name").val(),
+				gender: $("#gender").val(),
+				departmentName: $("#departmentName").val(),
+				title: $("#title").val()
+			};
+			request('POST', '/account/stuff/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					dataList[i].headimage = imgUrl + dataList[i].headimage;
+					if(dataList[i].title == "%str"){
+						dataList[i].title = "";
+					}
+					if(dataList[i].gender == 0) {
+						dataList[i].genderText = "男";
+					} else if(dataList[i].gender == 1) {
+						dataList[i].genderText = "女";
+					}
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+				loadDepartment();
+			}, function(res) {
+				layer.msg("员工加载失败");
+			})
+		}
+
+		function loadDepartment() {
+			var param = {}
+			request('POST', '/property/department/queryList.do', param, true, function(res) {
+				if(res.data.length == 0) {
+					layer.msg("请先新建部门", {
+						time: 2000
+					}, function() {
+						tabPage("5-0");
+					});
+				} else {
+					setData.departmentList = res.data;
+				}
+			}, function() {
+				layer.msg("部门加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

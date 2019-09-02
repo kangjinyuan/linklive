@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>物业账单</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app app-padding-bottom VDOM" v-cloak>
+			<!--<div class="app-title">
+				<div class="left back icon-back-white" onclick="goBack(-1);"></div>
+				<div class="title title-color-white">物业账单</div>
+			</div>-->
+			<div class="full-box" v-if="dataList.length == 0">
+				<div class="no-data-box">
+					<div class="icon icon-pay"></div>
+					<div class="text">您的账单已全部缴清了哦</div>
+				</div>
+			</div>
+			<div class="c-box" v-else>
+				<ul class="zd-box">
+					<li class="zd-list" v-for="(t,i) in dataList">
+						<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>
+						<div class="zd-list-box box-shadow">
+							<div class="zd-info">
+								<div class="text title" v-if="t.scheduleName">{{t.scheduleName}}</div>
+								<div class="text title" v-else>{{t.remark}}</div>
+								<div class="text address">{{t.address}}</div>
+							</div>
+							<div class="zd-money">￥{{t.fee}}</div>
+						</div>
+					</li>
+				</ul>
+				<div class='no-more-box' v-if="currentPage == totalPage && totalPage > 1">没有更多了</div>
+				<div class="pay-box">
+					<div class="allselect">
+						<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>
+						<div class="text">全选</div>
+					</div>
+					<div class="total-money">合计：￥{{total_fee}}</div>
+					<div v-if="total_count > 0" class="pay-btn" onclick="pay();">去缴费（{{total_count}}）</div>
+					<div v-else class="pay-btn disabled-btn">去缴费（0）</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var roomId = getQueryString("roomId");
+		var feeName = getQueryString("feeName");
+		param.total_fee = '0';
+		param.total_count = '0';
+		var payPlatform = "";
+
+		loadVue(param);
+
+		$(function() {
+			judeClient(function() {
+				accessCode = getQueryString("code");
+				var localAccessCode = window.localStorage.getItem("accessCode");
+				if(localAccessCode == accessCode) {
+					goBack(-1);
+				} else {
+					if(typeof WeixinJSBridge == "undefined") {
+						if(document.addEventListener) {} else if(document.attachEvent) {
+							document.attachEvent('WeixinJSBridgeReady', pay);
+							document.attachEvent('onWeixinJSBridgeReady', pay);
+						}
+					}
+					payPlatform = "PUBLIC";
+				}
+			}, function() {
+				payPlatform = "MWEB";
+			}, function() {
+				payPlatform = "MWEB";
+			})
+
+		})
+
+		function pay() {
+			var idList = new Array();
+			for(var i = 0; i < dataList.length; i++) {
+				idList.push(dataList[i].id);
+			}
+			judeClient(function() {
+				window.localStorage.setItem("accessCode", accessCode);
+				var param = {
+					idList: idList,
+					accessCode: accessCode,
+					payPlatform: payPlatform
+				}
+				request('POST', '/pay/wxpay/payBillOrder.do', param, true, function(res) {
+					var res = res;
+					WeixinJSBridge.invoke(
+						'getBrandWCPayRequest', {
+							"appId": res.data.appId,
+							"timeStamp": res.data.timeStamp,
+							"nonceStr": res.data.nonceStr,
+							"package": res.data.package,
+							"signType": "MD5",
+							"paySign": res.data.paySign
+						},
+						function(res) {
+							if(res.err_msg == "get_brand_wcpay_request:ok") {
+								window.location.href = "pay_result.html?pay_flag=ok";
+							} else if(res.err_msg == "get_brand_wcpay_request:cancel") {
+								layer.msg("支付取消", {
+									time: 2000
+								}, function() {
+									goBack(-1);
+								});
+							} else if(res.err_msg == "get_brand_wcpay_request:fail") {
+								window.location.href = "pay_result.html?pay_flag=fail";
+							}
+						}
+					);
+				}, function(res) {
+					window.location.href = "pay_result.html?pay_flag=fail";
+				})
+			}, function() {
+				var param = {
+					idList: idList,
+					payPlatform: payPlatform,
+					returnUrl: host + "/linklive/mobile/payment/pay_result.html?pay_flag=ok"
+				}
+				request('POST', '/pay/alipay/payBillOrder.do', param, true, function(res) {
+					window.location.href = "https://openapi.alipay.com/gateway.do?" + res.data;
+				}, function(res) {
+					window.location.href = "pay_result.html?pay_flag=fail";
+				})
+			}, function() {
+				layer.msg("请在微信公众号（邻客社区服务）中缴费");
+			});
+		}
+
+		function loadMore() {
+			scrollpage($(".c-box"), function() {
+				var param = {
+					roomId: roomId,
+					page: page,
+					state: 0,
+					feeName: feeName
+				}
+				var oldlist = setData.dataList;
+				request('POST', '/property/billCollection/queryListByRoomId.do', param, true, function(res) {
+					var dataList = res.data;
+					for(var i = 0; i < dataList.length; i++) {
+						dataList[i].isActive = false;
+						dataList[i].fee = parseFloat(dataList[i].fee).toFixed(2);
+						oldlist.push(dataList[i]);
+					}
+					setData.dataList = oldlist;
+					setData.allisActive = false;
+				}, function(res) {
+					layer.msg("物业账单加载失败");
+				})
+			})
+		}
+
+		function loadData() {
+			var param = {
+				roomId: roomId,
+				page: 1,
+				state: 0,
+				feeName: feeName
+			}
+			request('POST', '/property/billCollection/queryListByRoomId.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					dataList[i].fee = parseFloat(dataList[i].fee).toFixed(2);
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+			}, function(res) {
+				layer.msg("物业账单加载失败");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

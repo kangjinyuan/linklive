@@ -1,0 +1,148 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom VDOM" v-cloak>
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">标准名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="standardName" value="" class="required big len30" />
+						<div class="mask-list-prompt">标准名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">标准编码</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="standardCode" value="" class="required regular-code" placeholder="填写字母和数字" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">标准描述</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="standardDescription" class="required big" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">检查类别</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="checkCategoryName" disabled="disabled" class="required" />
+						<input type="hidden" name="" value="" id="checkCategoryId" class="required" />
+					</div>
+					<div class="btn icon icon-select" onclick="selectPart(0);">选择类别</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">点位范围</span>：</div>
+					<div class="mask-list-value">
+						<div class="no-range-box" v-if="dataList.length == 0">暂无点位范围</div>
+						<ul v-else class="range-box">
+							<li v-for="(t,i) in dataList">
+								{{t.pointName}}
+								<div class="del-range" v-on:click="delRange(i);"></div>
+							</li>
+						</ul>
+						<div class="btn icon icon-select" onclick="selectPart(1);">选择点位</div>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+
+		function selectPart(flag) {
+			if(flag == 0) {
+				openMask('', "selectCheckCategory", "选择类别", "98%", "98%", function(layerDom, layerIframe) {
+					var parentData = {
+						checkCategoryName: "checkCategoryName",
+						checkCategoryId: "checkCategoryId"
+					}
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			} else if(flag == 1) {
+				openMask('', "selectCheckPoints", "选择点位", "98%", "98%", function(layerDom, layerIframe) {
+					layerIframe[0].contentWindow.loadData(setData.dataList);
+				})
+			}
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var checkPointIds = [];
+				var dataList = setData.dataList;
+				for(var i = 0; i < dataList.length; i++) {
+					checkPointIds.push(dataList[i].id)
+				}
+
+				if(checkPointIds.length == 0) {
+					layer.msg("请选择点位范围");
+					return false;
+				}
+				if(checkPointIds.length > 10) {
+					layer.msg("点位范围不能超过10个点位");
+					return false;
+				}
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					standardName: $("#standardName").val(),
+					standardCode: $("#standardCode").val(),
+					checkCategoryName: $("#checkCategoryName").val(),
+					checkCategoryId: $("#checkCategoryId").val(),
+					checkPointIds: checkPointIds,
+					standardDescription: $("#standardDescription").val()
+				};
+				request('POST', '/property/checkStandard/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					if(res.code == "0004") {
+						layer.msg("该标准已存在，请勿重复操作");
+					} else {
+						layer.msg('操作失败，请检查网络或重试');
+					}
+				})
+			}
+		}
+
+		function loadCheckPoints(idList, callback) {
+			if(idList) {
+				var param = {
+					idList: idList
+				};
+				request('POST', '/property/checkPoint/queryList.do', param, true, function(res) {
+					setData.dataList = res.data;
+					callback();
+				}, function() {
+					layer.msg("点位加载失败");
+				})
+			}
+		}
+	</script>
+
+</html>

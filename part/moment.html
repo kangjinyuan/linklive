@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/photoloadinit.js"></script>
+		<script src="../js/photoload.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom VDOM" v-cloak>
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">帖子内容</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" class="layer-edit-box" v-bind:value="momentInfo.content"></textarea>
+					</div>
+				</div>
+				<div class="mask-list" v-if="momentInfo.imageList && momentInfo.imageList.length > 0">
+					<div class="mask-list-name"><span class="text">帖子图片：</div>
+					<div class="mask-list-value">
+						<div v-for="(image,i) in momentInfo.imageList" v-bind:class="['img-box',i == 5?'c_b':'',i > 4?'margin-top-small':'']">
+							<img v-bind:src="image" alt="" onerror="this.src='../img/no-img.png'" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-del" v-on:click="del(momentInfo.id);" id="creatsave">删除</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.momentInfo = {};
+		loadVue(param);
+
+		function loadData(momentInfo) {
+			setData.momentInfo = momentInfo;
+		}
+	</script>
+
+</html>

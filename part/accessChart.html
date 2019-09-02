@@ -1,0 +1,183 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="full-box">
+				<div class="chart-list-canvas-box" id="tj"></div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+
+		function loadData() {
+			var tj = document.getElementById("tj");
+			var tj_chart = echarts.init(tj);
+			var name = ["1号", "2号", "3号", "4号", "5号", "6号", "7号", "8号", "9号", "10号", "11号", "12号", "13号", "14号", "15号", "16号", "17号", "18号", "19号", "20号", "21号", "22号", "23号", "24号", "25号", "26号", "27号", "28号", "29号", "30号"];
+			var tjvalue1 = ["1232", "1310", "1094", "1200", "893", "874", "298", "321", "3021", "1019", "1827", "1726", "1948", "1728", "1625", "1827", "1746", "1726", "232", "324", "756", "2817", "3984", "2762", "3937", "2726", "5242", "32", "433", "432"];
+			var tjvalue2 = ["2826", "3029", "3029", "3920", "3036", "4321", "4563", "15300", "10297", "5242", "6482", "9847", "22121", "32321", "22313", "23133", "2123", "2313", "33214", "24431", "21345", "21365", "12334", "32165", "32413", "35421", "43432", "32154", "32332", "2153"];
+			var tjvalue3 = ["30", "10", "9", "32", "10", "4", "31", "13", "15", "16", "23", "54", "41", "22", "21", "13", "24", "65", "23", "54", "5", "65", "34", "64", "13", "54", "13", "44", "13", "53"];
+			var tj_option = {
+				color: ['#1f487c'],
+				title: {
+					text: '出入情况统计表',
+					left: 'center'
+				},
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'shadow'
+					}
+				},
+				legend: {
+					top: '30',
+					data: ['刷卡（次）', '手机App（次）', '二维码（次）']
+				},
+				grid: {
+					x: 40,
+					containLabel: true
+				},
+				xAxis: [{
+					name: '时间',
+					type: 'category',
+					data: name,
+					axisTick: {
+						alignWithLabel: true
+					},
+					axisLabel: {
+						interval: 0,
+						rotate: 45,
+						textStyle: {
+							color: "#000",
+							fontWeight: "bold"
+						}
+					},
+				}],
+				yAxis: [{
+					name: '出入次数（次）',
+					type: 'value',
+				}],
+				series: [{
+					name: '刷卡（次）',
+					type: 'line',
+					symbolSize: 15,
+					borderWidth: 5,
+					hoverAnimation: true,
+					label: {
+						normal: {
+							show: true,
+							position: 'top'
+						}
+					},
+					itemStyle: {
+						normal: {
+							color: 'rgba(193,0,0,0.6)'
+						}
+					},
+					lineStyle: {
+						normal: {
+							color: 'rgba(193,0,0,0.6)',
+							width: 3,
+							shadowColor: 'rgba(0,0,0,0.75)'
+						}
+					},
+					data: tjvalue1
+				}, {
+					name: '手机App（次）',
+					type: 'line',
+					symbolSize: 15,
+					borderWidth: 5,
+					hoverAnimation: true,
+					label: {
+						normal: {
+							show: true,
+							position: 'top'
+						}
+					},
+					itemStyle: {
+						normal: {
+							color: 'rgba(213,125,30,0.6)'
+						}
+					},
+					lineStyle: {
+						normal: {
+							color: 'rgba(213,125,30,0.6)',
+							width: 3,
+							shadowColor: 'rgba(0,0,0,0.75)'
+						}
+					},
+					data: tjvalue2
+				}, {
+					name: '二维码（次）',
+					type: 'line',
+					symbolSize: 15,
+					borderWidth: 5,
+					hoverAnimation: true,
+					label: {
+						normal: {
+							show: true,
+							position: 'top'
+						}
+					},
+					itemStyle: {
+						normal: {
+							color: 'rgba(7,40,241,0.8)'
+						}
+					},
+					lineStyle: {
+						normal: {
+							color: 'rgba(7,40,241,0.8)',
+							width: 3,
+							shadowColor: 'rgba(0,0,0,0.75)'
+						}
+					},
+					data: tjvalue3
+				}]
+			};
+			tj_chart.setOption(tj_option, true);
+		}
+		loadData();
+
+		//		加载数据
+		//		function loadData() {
+		//			var param = {
+		//				page: page,
+		//				blur: $("#salerName").val(),
+		//				gender: $("#gender").val()
+		//			};
+		//			request('POST', 'saler/queryList.do', 1, param,true, function(res) {
+		//				var dataList = res.data;
+		//				setData.allisActive = false;
+		//				setData.dataList = dataList;
+		//				setData.currentPage = res.currentPage;
+		//				setData.count = res.count;
+		//				setData.pageSize = res.pageSize;
+		//				setData.dataLength = res.data.length;
+		//			}, function() {
+		//				layer.msg("菜单加载失败");
+		//			})
+		//		}
+	</script>
+
+</html>

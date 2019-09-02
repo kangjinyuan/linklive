@@ -1,0 +1,51 @@
+[{
+	"id" : "0",
+	"title" : "业主报事",
+	"checked" : false,
+	"sort" : "999"
+},{
+	"id" : "1",
+	"title" : "维修任务",
+	"checked" : false,
+	"sort" : "998"
+},{
+	"id" : "2",
+	"title" : "快递代收",
+	"checked" : false,
+	"sort" : "992"
+},{
+	"id" : "3",
+	"title" : "抄表",
+	"checked" : false,
+	"sort" : "993"
+},{
+	"id" : "4",
+	"title" : "远程开门",
+	"checked" : true,
+	"sort" : "996"
+},{
+	"id" : "5",
+	"title" : "人脸登记",
+	"checked" : true,
+	"sort" : "994"
+},{
+	"id" : "6",
+	"title" : "工作计划",
+	"checked" : false,
+	"sort" : "997"
+},{
+	"id" : "7",
+	"title" : "工单管理",
+	"checked" : false,
+	"sort" : "995"
+},{
+	"id" : "8",
+	"title" : "考勤",
+	"checked" : false,
+	"sort" : "991"
+},{
+	"id" : "9",
+	"title" : "巡更",
+	"checked" : false,
+	"sort" : "990"
+}]

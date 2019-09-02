@@ -1,0 +1,140 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="full-box">
+				<div class="chart-list-canvas-box"></div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+		var carAccessChart = echarts.init($(".chart-list-canvas-box").get(0));
+
+		function loadData() {
+			var dateArray = getAppointDate(7, 0);
+			var outNumber = ["12", "34", "8", "78", "2", "25", "22"];
+			var inNumber = ["10", "36", "8", "80", "4", "28", "30"];
+			carAccessChart.setOption({
+				tooltip: {
+					trigger: 'axis',
+					axisPointer: {
+						type: 'cross'
+					}
+				},
+				legend: {
+					bottom: '0',
+					data: ['出场次数（次）', '进场次数（次）']
+				},
+				grid: {
+					left: "30",
+					right: "10",
+					top: "20"
+				},
+				xAxis: [{
+					type: 'category',
+					data: dateArray,
+					axisTick: {
+						alignWithLabel: true
+					},
+					axisLabel: {
+						interval: 0,
+						textStyle: {
+							color: "#666"
+						}
+					},
+					axisLine: {
+						show: true,
+						lineStyle: {
+							color: ["#e5e5e5"]
+						}
+					}
+				}],
+				yAxis: [{
+					type: 'value',
+					axisLabel: {
+						interval: 0,
+						textStyle: {
+							color: "#666"
+						}
+					},
+					splitLine: {
+						lineStyle: {
+							color: ["#e5e5e5"]
+						}
+					},
+					axisLine: {
+						show: true,
+						lineStyle: {
+							color: ["#e5e5e5"]
+						}
+					}
+				}],
+				series: [{
+					name: '出场次数（次）',
+					type: 'line',
+					symbol: "circle",
+					symbolSize: 8,
+					hoverAnimation: true,
+					itemStyle: {
+						normal: {
+							color: '#359df5',
+							borderWidth: 3,
+							borderColor: "#aeddff"
+						}
+					},
+					lineStyle: {
+						normal: {
+							color: '#359df5',
+							width: 1
+						}
+					},
+					data: outNumber
+				}, {
+					name: '进场次数（次）',
+					type: 'line',
+					symbol: "circle",
+					symbolSize: 8,
+					hoverAnimation: true,
+					itemStyle: {
+						normal: {
+							color: '#fd7270',
+							borderWidth: 3,
+							borderColor: "#fec8c7"
+						}
+					},
+					lineStyle: {
+						normal: {
+							color: '#fd7270',
+							width: 1
+						}
+					},
+					data: inNumber
+				}]
+			}, true);
+		}
+		loadData();
+	</script>
+
+</html>

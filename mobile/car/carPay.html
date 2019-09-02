@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客智慧停车</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="full-box car-bg">
+				<div class="car-box">
+					<div class="car-title-box">
+						<div class="car-title">欢迎使用邻客智慧停车服务</div>
+						<div class="car-dir">邻客缴费</div>
+					</div>
+					<div class="car-comment-box">
+						<div class="car-query-box">
+							<div class="car-number-box">
+								<div class="car-number-text-box" v-for="t in carnoarr">
+									<span>{{t}}</span>
+								</div>
+							</div>
+						</div>
+						<div class="fk-line"></div>
+						<div class="car-bottom-box">
+							<div class="car-pay-title">已停10分钟</div>
+							<div class="car-pay-info-box">
+								<div class="car-pay-info">
+									<div class="title">停车单价</div>
+									<div class="info">5元 / 小时</div>
+								</div>
+								<div class="cutline"></div>
+								<div class="car-pay-info">
+									<div class="title">入场时间</div>
+									<div class="info">2018-10-23 11:05</div>
+								</div>
+							</div>
+						</div>
+						<div class="pay-box">
+							<div class="pay-fee">待支付：<span>5.00</span> 元</div>
+							<div class="pay-btn" onclick="pay();">支付</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.carnoarr = [];
+		param.payinfo = {};
+		loadVue(param);
+		var tradeType = "";
+
+		$(function() {
+			judeClient(function() {
+				if(typeof WeixinJSBridge == "undefined") {
+					if(document.addEventListener) {
+						//						document.addEventListener('WeixinJSBridgeReady', pay, false);
+					} else if(document.attachEvent) {
+						document.attachEvent('WeixinJSBridgeReady', pay);
+						document.attachEvent('onWeixinJSBridgeReady', pay);
+					}
+				}
+				tradeType = "PUBLIC";
+			}, function() {
+				tradeType = "ALIPAY";
+			}, function() {
+				tradeType = "MWEB";
+			})
+		})
+
+		function loadData() {
+			var payinfo = {
+				"carNo": '京A82772',
+			};
+			setData.carnoarr = payinfo.carNo.split("");
+			setData.payinfo = payinfo;
+		}
+
+		function pay() {
+
+			var param = {
+				idList: ['Bill_17_1540523437881'],
+				accessCode: accessCode,
+				tradeType: tradeType
+			}
+			request('POST', '/pay/wxpay/payBillOrder.do', param, true, function(res) {
+				var res = res;
+				judeClient(function() {
+					WeixinJSBridge.invoke(
+						'getBrandWCPayRequest', {
+							"appId": res.data.appId,
+							"timeStamp": res.data.timeStamp,
+							"nonceStr": res.data.nonceStr,
+							"package": res.data.package,
+							"signType": "MD5",
+							"paySign": res.data.paySign
+						},
+						function(res) {
+							if(res.err_msg == "get_brand_wcpay_request:ok") {
+								window.location.href = "pay_result.html?pay_flag=ok";
+							} else if(res.err_msg == "get_brand_wcpay_request:cancel") {
+								layer.msg("取消支付", {
+									time: 2000
+								}, function() {
+									goBack(-1);
+								});
+							} else if(res.err_msg == "get_brand_wcpay_request:fail") {
+								window.location.href = "pay_result.html?pay_flag=fail";
+							}
+						}
+					);
+				}, function() {
+					var timestamp = new Date();
+					var biz_content = {
+						"subject": res.data.subject,
+						"out_trade_no": res.data.out_trade_no,
+						"timeout_express": "90m",
+						"total_amount": res.data.total_amount,
+						"product_code": res.data.product_code
+					}
+					biz_content = JSON.stringify(biz_content);
+					//					var postUrl = "https://openapi.alipay.com/gateway.do?timestamp=" + resetTime(timestamp, 0) + "&method=alipay.trade.wap.pay&app_id=" + res.data.app_id + "&sign_type=RSA2&sign=" + res.data.sign + "&version=1.0&biz_content=" + biz_content
+					var requestUrl = "https://openapi.alipay.com/gateway.do?timestamp=" + resetTime(timestamp, 0) + "alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2018101661691470&biz_content=%7B%22body%22%3A%22%E9%82%BB%E5%AE%A2%E7%A4%BE%E5%8C%BA%E7%89%A9%E4%B8%9A%E8%B4%B9%E8%B4%A6%E5%8D%95%22%2C%22out_trade_no%22%3A%22BILL-2018122809530125293%22%2C%22product_code%22%3A%22QUICK_WAP_WAY%22%2C%22subject%22%3A%22%E9%82%BB%E5%AE%A2%E7%A4%BE%E5%8C%BA%E7%89%A9%E4%B8%9A%E8%B4%B9%E8%B4%A6%E5%8D%95%22%2C%22timeout_express%22%3A%2230m%22%2C%22total_amount%22%3A%220.01%22%7D&charset=utf-8&format=json&method=alipay.trade.wap.pay&notify_url=http%3A%2F%2Ftest.api.15275317531.com%2F%2Fpay%2Falipay%2Fcallback.do&return_url=www.baidu.com&sign=M7V0r%2FtCLiJjks02wkdU837giMiI%2BoCUvOlNadejmDiL28QEjjlKSZ8FtHlt8IFFSp9xlCed8e5ajfATrl56w0Evo0ocVxv4u9i2PHvOxnHYMxgHUzWGiHQwb7uYmq%2FhGwo6qTPxf84%2BBQB6X%2BMKXmrbwiaqvzHa6tiTy3kQRbevbIWRKTnKqGKBkMWyk1Q6XY23jnhKn7u55DH9oMqRjpkk9zmWUC7iR7jUmTnv6sjVrRYUQVzilnaKaAPNsp498bv1DPNZyUOmx4R8%2ByHiCg%2BI0BhSpOXaHbVHWqAbC1oWbs%2BvPzK35Wjc8i94oYwOmWr4WMJcFzvuKq3WOP4SOw%3D%3D&sign_type=RSA2&timestamp=2018-12-28+09%3A53%3A01&version=1.0"
+					var alipayparam = {};
+					request('POST', requestUrl, alipayparam, true, function(res) {
+						layer.msg("支付成功");
+					}, function(res) {
+						layer.msg("支付失败");
+					});
+				}, function() {
+					window.location.href = res.data;
+				})
+			}, function(res) {
+				window.location.href = "pay_result.html?pay_flag=fail";
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

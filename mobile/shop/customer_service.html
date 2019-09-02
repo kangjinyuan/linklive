@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>申请售后</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=613d4dd535" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="c-box">
+				<ul class="select-customer-service-box">
+					<li onclick="selectCustomerService(this);">仅退款</li>
+					<li onclick="selectCustomerService(this);">退货退款</li>
+					<li onclick="selectCustomerService(this);">换货</li>
+				</ul>
+				<div class="customer-service-text box-shadow">
+					<textarea name="" rows="" cols="" placeholder="请输入您的问题详情，以便于管家更准确的了解并解决您的问题。" id="content" oninput="setNum(this);" maxlength="120"></textarea>
+					<div class="word-number">{{wordNumber}}/120</div>
+				</div>
+			</div>
+			<div class="big-btn" onclick="send();">确认</div>
+		</div>
+	</body>
+	<script>
+		var type = "";
+		var id = getQueryString("id");
+		param.wordNumber = 0;
+		loadVue(param);
+
+		function selectCustomerService(t) {
+			if($(t).hasClass("selected") == true) {
+				$(t).removeClass("selected").siblings().removeClass("selected");
+				type = "";
+			} else {
+				$(t).addClass("selected").siblings().removeClass("selected");
+				type = $(t).text();
+			}
+		}
+
+		function send() {
+			if(type == "") {
+				layer.msg("请选择售后服务");
+				return false;
+			}
+
+			if($("#content").val() == "") {
+				layer.msg("请填写您的问题");
+				return false;
+			}
+			window.location.href = "customer_service_result.html?pay_flag=ok";
+		}
+	</script>
+
+</html>

@@ -1,0 +1,94 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.ToolBar"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="full-box" id="container"></div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+		var markerList = [];
+		var map = new AMap.Map('container', {
+			zoom: 20,
+			center: [communityInfo.longitude, communityInfo.latitude]
+		})
+		var circle = new AMap.Circle({
+			center: [communityInfo.longitude, communityInfo.latitude],
+			radius: 300,
+			strokeColor: '#fda41480',
+			strokeWeight: 1,
+			fillColor: '#fda41420',
+			zIndex: 10,
+			bubble: true,
+			cursor: 'pointer'
+		})
+		circle.setMap(map);
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				pageSize: "10000"
+			}
+			request('POST', '/account/stuff/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i].longitude) {
+						var longitude = dataList[i].longitude;
+						var latitude = dataList[i].latitude;
+						if(dataList[i].gender == 0) {
+							dataList[i].genderText = "男";
+						} else if(dataList[i].gender == 1) {
+							dataList[i].genderText = "女";
+						}
+						dataList[i].markerContent = "<div class='marker-info-box'><p>姓名：" + dataList[i].name + "</p><p>性别：" + dataList[i].genderText + "</p><p>经度：" + dataList[i].longitude + "</p><p>纬度：" + dataList[i].latitude + "</p><p>定位时间：" + dataList[i].locationUpdateTime + "</p></div>";
+						var marker = new AMap.Marker({
+							position: new AMap.LngLat(longitude, latitude),
+							clickable: true,
+							title: dataList[i].name
+						});
+						marker.on('click', function(e) {
+							var position = [e.lnglat.lng, e.lnglat.lat];
+							var title = e.target.B.title;
+							for(var i = 0; i < dataList.length; i++) {
+								if(title == dataList[i].name) {
+									var infoWindow = new AMap.InfoWindow({
+										anchor: 'middle-left',
+										content: dataList[i].markerContent,
+									});
+									infoWindow.open(map, position);
+								}
+							}
+						});
+						markerList.push(marker);
+					}
+				}
+				map.add(markerList);
+			}, function(res) {
+				layer.msg("员工加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

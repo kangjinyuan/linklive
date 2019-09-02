@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>发布结果</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=613d4dd535" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../js/app.js?v=7a4ab3fb3e"></script>
+	</head>
+
+	<body>
+		<div class="app">
+			<div class="c-box">
+				<div class="result-box">
+					<div class="icon-result"></div>
+					<div class="text"></div>
+				</div>
+				<div class="result-btn-box">
+					<div class="result-btn"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			var comment_flag = getQueryString("comment_flag");
+			if(comment_flag == 'ok') {
+				$(".icon-result").addClass("icon-comment-ok");
+				$(".result-box .text").text("发布成功");
+				$(".result-btn").text("完成").attr("onclick", "jsToApp('3','');");
+				var data = {
+					pageType: "0",
+					value: ""
+				}
+				jsToApp("6", data);
+			} else if(comment_flag == 'fail') {
+				$(".icon-result").addClass("icon-comment-fail");
+				$(".result-box .text").text("发布失败");
+				$(".result-btn").text("返回").attr("onclick", "goBack(-1)");
+			}
+		})
+	</script>
+
+</html>

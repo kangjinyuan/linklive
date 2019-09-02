@@ -1,0 +1,719 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/common.css?v=ac68d45dc5" />
+		<script src="js/jquery-1.9.1.min.js"></script>
+		<script src="js/echarts-all-3.js"></script>
+		<script src="layui/layui.all.js"></script>
+		<script src="js/vue.min.js"></script>
+		<script src="js/postUrl.js?v=2f85f2877b"></script>
+		<script src="js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="chart-box">
+				<div class="chart-list-box chart-list-width-30 chart-list-person">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								社区人员情况
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<ul class="chart-list-content-tow-row-box">
+								<li>
+									<div class="chart-list-name">登记业主：</div>
+									<div class="chart-list-value">{{personInfo.proprietorCount}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">员工数：</div>
+									<div class="chart-list-value">{{personInfo.staffCount}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">注册用户：</div>
+									<div class="chart-list-value">{{personInfo.registerCount}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">活跃用户：</div>
+									<div class="chart-list-value">{{personInfo.activeCount}}</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-40 chart-list-fee-today">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								今日收费情况
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<ul class="chart-list-content-one-row-box">
+								<li>
+									<div class="chart-list-name">今日收费</div>
+									<div class="chart-list-value"><span>￥</span>{{feeTodayInfo.totalFee}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">收费笔数</div>
+									<div class="chart-list-value">{{feeTodayInfo.totalTransaction}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">线上缴费</div>
+									<div class="chart-list-value"><span>￥</span>{{feeTodayInfo.totalOnlineFee}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">线上缴费率</div>
+									<div class="chart-list-value">{{feeTodayInfo.onlineFeeRatio}}%</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-30 chart-list-task">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								任务统计
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<ul class="chart-list-content-tow-row-box">
+								<li>
+									<div class="chart-list-name">计划任务：</div>
+									<div class="chart-list-value">{{taskInfo.total}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">完成率：</div>
+									<div class="chart-list-value">{{taskInfo.completeRatio}}%</div>
+								</li>
+								<li>
+									<div class="chart-list-name">发现问题：</div>
+									<div class="chart-list-value">{{taskInfo.issueCount}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">问题率：</div>
+									<div class="chart-list-value">{{taskInfo.issueRatio}}%</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-60">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								物业经营情况
+							</div>
+							<div class="opera-box">
+								<select name="" id="month" onchange="getFeeInfo();">
+									<option value="1">1月</option>
+									<option value="2">2月</option>
+									<option value="3">3月</option>
+									<option value="4">4月</option>
+									<option value="5">5月</option>
+									<option value="6">6月</option>
+									<option value="7">7月</option>
+									<option value="8">8月</option>
+									<option value="9">9月</option>
+									<option value="10">10月</option>
+									<option value="11">11月</option>
+									<option value="12">12月</option>
+								</select>
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-fee-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-40">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								通行统计
+							</div>
+							<div class="opera-box" v-if="doorMasterList.length > 0">
+								<select name="" id="deviceSn" class="big" v-on:change="getDoorGuard(true);">
+									<option v-bind:value="t.deviceSn" v-for="t in doorMasterList">{{t.deviceName}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-door-guard-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-30">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								报事报修统计
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-maintenance-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-40">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								工单统计
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-work-order-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-30">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								社区动态
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<ul class="chart-list-tab-box chart-list-dynamic-tab-box">
+								<li>责任人</li>
+								<li>描述</li>
+								<li>时间</li>
+							</ul>
+							<div class="chart-list-content chart-list-content-dynamic-box">
+								<div class="full-box" v-if="dataList.length == 0">
+									<div class="no-data-box">
+										<div class="icon icon-no-data"></div>
+										<div class="no-data-text">暂时没有社区动态哦</div>
+									</div>
+								</div>
+								<ul v-else class="chart-list-content-position-box chart-list-content-dynamic-inner-box">
+									<li v-for="t in dataList">
+										<div>{{t.charger}}</div>
+										<div>{{t.detail}}</div>
+										<div>{{t.eventTime | resetTime(13)}}</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.doorMasterList = [];
+		param.personInfo = {}
+		param.feeTodayInfo = {}
+		param.taskInfo = {}
+		loadVue(param);
+		var date = new Date();
+		$("#month").val(date.getMonth() + 1);
+		var feeChart = echarts.init($(".chart-fee-canvas-box").get(0));
+		var doorGuardChart = echarts.init($(".chart-door-guard-canvas-box").get(0));
+		var maintenanceChart = echarts.init($(".chart-maintenance-canvas-box").get(0));
+		var workOrderChart = echarts.init($(".chart-work-order-canvas-box").get(0));
+
+		function resetChartSize() {
+			bindWindowChange(function() {
+				feeChart.resize();
+				doorGuardChart.resize();
+				maintenanceChart.resize();
+				workOrderChart.resize();
+			})
+		}
+
+		function getPersonInfo() {
+			var param = {};
+			request("POST", "/statistics/person/record.do", param, true, function(res) {
+				setData.personInfo = res.data;
+			}, function(res) {
+				layer.msg("社区人员情况加载失败");
+			})
+		}
+
+		function getFeeTodayInfo() {
+			var param = {
+				month: "0"
+			}
+			request('POST', '/statistics/fee/record.do', param, true, function(res) {
+				var feeTodayInfo = res.data;
+				if(feeTodayInfo.totalFee == 0) {
+					var onlineFeeRatio = 0;
+				} else {
+					var onlineFeeRatio = parseFloat(feeTodayInfo.totalOnlineFee) / parseFloat(feeTodayInfo.totalFee);
+				}
+				feeTodayInfo.totalFee = feeTodayInfo.totalFee.toFixed(2);
+				feeTodayInfo.totalOnlineFee = feeTodayInfo.totalOnlineFee.toFixed(2);
+				feeTodayInfo.onlineFeeRatio = onlineFeeRatio.toFixed(2);
+				setData.feeTodayInfo = feeTodayInfo;
+			}, function(res) {
+				layer.msg("今日收费情况加载失败");
+			})
+		}
+
+		function getTaskInfo() {
+			var param = {}
+			request('POST', '/statistics/stuff/taskRecord.do', param, true, function(res) {
+				setData.taskInfo = res.data;
+			}, function(res) {
+				layer.msg("任务统计加载失败");
+			})
+		}
+
+		function getDynamic() {
+			var param = {}
+			request('POST', '/statistics/timeLine/record.do', param, false, function(res) {
+				setData.dataList = res.data;
+				nextTick(function() {
+					seamlessRolling($(".chart-list-content-dynamic-inner-box"), 7);
+				})
+			}, function(res) {
+				layer.msg("社区动态加载失败");
+			})
+		}
+
+		function getFeeInfo() {
+			var param = {
+				month: $("#month").val()
+			}
+			request('POST', '/statistics/fee/record.do', param, true, function(res) {
+				var dataList = res.data;
+				var feeName = getTotalFee(dataList).feeName;
+				var totalValue = getTotalFee(dataList).totalValue;
+				feeChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					grid: {
+						left: "50",
+						right: "10",
+						top: "20"
+					},
+					xAxis: [{
+						type: 'category',
+						data: feeName,
+						axisLabel: {
+							interval: 0,
+							rotate: 315,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '收入（元）',
+						type: 'bar',
+						barWidth: 20,
+						label: {
+							normal: {
+								show: true,
+								position: "top",
+								textStyle: {
+									color: "#359df5"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 1, 0, 0, [{
+											offset: 0,
+											color: '#359df5'
+										},
+										{
+											offset: 1,
+											color: '#7bc8ff'
+										}
+									]
+								),
+								barBorderRadius: 10
+							}
+						},
+						data: totalValue
+					}]
+				}, true);
+			}, function() {
+				layer.msg("物业经营情况加载失败");
+			})
+		}
+
+		function getDoorMaster() {
+			var param = {
+				pageSize: "10000"
+			}
+			request("POST", "/facility/doorMaster/queryList.do", param, true, function(res) {
+				setData.doorMasterList = res.data;
+				nextTick(function() {
+					getDoorGuard(false);
+				})
+			}, function(res) {
+				layer.msg("门禁设备加载失败");
+			});
+		}
+
+		function getDoorGuard(isLoading) {
+			var param = {
+				deviceSn: $("#deviceSn").val()
+			}
+			request('POST', '/statistics/doorGuard/record.do', param, isLoading, function(res) {
+				var dataList = res.data;
+				var dateArray = getAppointDate(7, 0);
+				var openingNumber = getIndexArray(dataList, 0, true);
+				var faceOpeningNumber = getIndexArray(dataList, 2, false);
+				var visitors = getIndexArray(dataList, 3, false);
+				doorGuardChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					legend: {
+						bottom: '0',
+						data: ['开门数（次）', '人脸开门数（次）', '访客数（人）']
+					},
+					grid: {
+						left: "30",
+						right: "10",
+						top: "20"
+					},
+					xAxis: [{
+						type: 'category',
+						data: dateArray,
+						axisTick: {
+							alignWithLabel: true
+						},
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '开门数（次）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#359df5',
+								borderWidth: 3,
+								borderColor: "#aeddff"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#359df5',
+								width: 1
+							}
+						},
+						data: openingNumber
+					}, {
+						name: '人脸开门数（次）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#fd7270',
+								borderWidth: 3,
+								borderColor: "#fec8c7"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#fd7270',
+								width: 1
+							}
+						},
+						data: faceOpeningNumber
+					}, {
+						name: '访客数（人）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						borderWidth: 1,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#fcb609',
+								borderWidth: 3,
+								borderColor: "#ffe4a3"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#fcb609',
+								width: 1
+							}
+						},
+						data: visitors
+					}]
+				}, true);
+			}, function(res) {
+				layer.msg("通行统计加载失败");
+			})
+		}
+
+		function getMaintenance() {
+			var param = {}
+			request('POST', '/statistics/maintenanceReport/record.do', param, true, function(res) {
+				var maintenanceInfo = res.data;
+				maintenanceInfo = [{
+					name: '水',
+					value: maintenanceInfo.waterReportCount,
+				}, {
+					name: '电',
+					value: maintenanceInfo.electricReportCount,
+				}, {
+					name: '燃气',
+					value: maintenanceInfo.gasReportCount,
+				}, {
+					name: '门锁',
+					value: maintenanceInfo.lockReportCount,
+				}, {
+					name: '其他',
+					value: maintenanceInfo.otherReportCount,
+				}];
+				maintenanceChart.setOption({
+					tooltip: {
+						trigger: 'item',
+						formatter: "{a} <br/>{b} : {c} ({d}%)"
+					},
+					legend: {
+						bottom: "0",
+						itemWidth: 10,
+						itemHeight: 10,
+						data: ['水', "电", "燃气", "门锁", "其他"]
+					},
+					series: [{
+						name: '报事报修率',
+						type: 'pie',
+						radius: ["20%", "60%"],
+						center: ['50%', '45%'],
+						roseType: 'radius',
+						label: {
+							normal: {
+								show: true
+							}
+						},
+						labelLine: {
+							normal: {
+								show: true
+							}
+						},
+						data: maintenanceInfo
+					}],
+					color: ['#fd7270', '#9871fb', '#4aed93', '#fec027', '#f581e6']
+				}, true);
+			}, function(res) {
+				layer.msg("报事报修统计加载失败");
+			})
+		}
+
+		function getWorkOrder() {
+			var param = {}
+			request('POST', '/statistics/workOrder/record.do', param, true, function(res) {
+				var workOrderInfo = res.data;
+				reportType = ["保洁类", "绿化类", "秩序类", "工程类", "客服类"];
+				completed = [workOrderInfo.cleanCompleteCount, workOrderInfo.greeningCompleteCount, workOrderInfo.securityCompleteCount, workOrderInfo.engineerCompleteCount, workOrderInfo.customerCompleteCount];
+				inCompleted = [workOrderInfo.cleanIncompleteCount, workOrderInfo.greeningIncompleteCount, workOrderInfo.securityIncompleteCount, workOrderInfo.engineerIncompleteCount, workOrderInfo.customerIncompleteCount]
+				workOrderChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					legend: {
+						bottom: '0',
+						data: ['已完成', '未完成']
+					},
+					grid: {
+						left: "50",
+						right: "10",
+						top: "0"
+					},
+					xAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'category',
+						data: reportType,
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '已完成',
+						type: 'bar',
+						barWidth: 14,
+						stack: '总量',
+						hoverAnimation: true,
+						label: {
+							normal: {
+								show: true,
+								position: 'top',
+								textStyle: {
+									color: "#359df5"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 0, 1, 0, [{
+											offset: 0,
+											color: '#359df5'
+										},
+										{
+											offset: 1,
+											color: '#7bc8ff'
+										}
+									]
+								),
+								barBorderRadius: [7, 0, 0, 7]
+							}
+						},
+						data: completed
+					}, {
+						name: '未完成',
+						type: 'bar',
+						barWidth: 20,
+						stack: '总量',
+						hoverAnimation: true,
+						label: {
+							normal: {
+								show: true,
+								position: 'top',
+								textStyle: {
+									color: "#666"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: '#def1ff',
+								barBorderRadius: [0, 7, 7, 0]
+							}
+						},
+						data: inCompleted
+					}]
+				}, true);
+			}, function(res) {
+				layer.msg("工单统计加载失败");
+			})
+		}
+		getDoorMaster();
+		getFeeInfo();
+		getMaintenance();
+		getWorkOrder();
+		getPersonInfo();
+		getFeeTodayInfo();
+		getTaskInfo();
+		getDynamic();
+		resetChartSize();
+		var resetDynamic = setInterval(function() {
+			getDynamic();
+		}, 60000);
+	</script>
+
+</html>

@@ -1,0 +1,128 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/selectExcel.js?v=d20074bcdd"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask VDOM" v-cloak>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">点位名称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="pointName" placeholder="输入点位名称" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">点位编码：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="pointCode" placeholder="输入点位编码" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有检查点位哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<tr v-on:click="allSelectExcel()">
+								<th class="padding20">
+									<div v-bind:class="['no-check',allisActive?'checked':'']"></div>序号</th>
+								<th>点位名称</th>
+								<th>点位编码</th>
+								<th>创建时间</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(t,i) in dataList" v-on:click="selectExcel(t)">
+								<td class="padding20">
+									<div v-bind:class="['no-check',t.isActive?'checked':'']"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.pointName}}</td>
+								<td>{{t.pointCode}}</td>
+								<td>{{t.createTime}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadSmallPage();
+
+		function setParentData() {
+			var idList = [];
+			if(selectDataList.length == 0) {
+				idList.push("0");
+			} else {
+				for(var i = 0; i < selectDataList.length; i++) {
+					idList.push(selectDataList[i].id);
+				}
+			}
+			parent.loadCheckPoints(idList, function() {});
+		}
+
+		//		加载数据
+		function loadData(parentData) {
+			var param = {
+				page: page,
+				pointName: $("#pointName").val(),
+				pointCode: $("#pointCode").val(),
+				state: "1"
+			};
+			request('POST', '/property/checkPoint/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				selectDataList = parentData;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					for(var j = 0; j < selectDataList.length; j++) {
+						if(selectDataList[j].id == dataList[i].id) {
+							dataList[i].isActive = true;
+						}
+					}
+				}
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i].isActive == true) {
+						setData.allisActive = true;
+					} else {
+						setData.allisActive = false;
+						break;
+					}
+				}
+				setData.dataList = dataList;
+				setData.parentData = parentData;
+			}, function() {
+				layer.msg("点位加载失败");
+			})
+		}
+	</script>
+
+</html>

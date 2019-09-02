@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/jquery.table2excel.min.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">警报记录</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">警报类别：</div>
+						<div class="search-value">
+							<select name="" id="alertType">
+								<option value="">==请选择警报类别==</option>
+								<option value="0">入侵报警</option>
+								<option value="1">火灾报警</option>
+								<option value="2">水压报警</option>
+								<option value="3">水位报警</option>
+								<option value="4">电气火灾报警</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div class="btn icon icon-export" onclick="exportAlertRecord();">导出</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有警报记录哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table id="alertRecordExcel">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>警报对象</th>
+								<th>警报类别</th>
+								<th>警报内容</th>
+								<th>创建时间</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<tr v-for="(t,i) in dataList">
+								<td>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>消防1号点位</td>
+								<td>火灾报警</td>
+								<td>1号点位有火灾发生</td>
+								<td>{{t.createTime}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadPage(function() {
+			setTime('#startTime', "date");
+			setTime('#endTime', "date");
+		});
+
+		function exportAlertRecord() {
+			var communityName = communityInfo.name;
+			var dom = $("#alertRecordExcel");
+			var filename = communityName + "警报记录";
+			var columns = "5";
+			exportExcel(dom, columns, filename);
+		}
+
+		function loadData() {
+			var param = {
+				page: page,
+				pageSize: '5000',
+				alertType: $("#alertType").val()
+			}
+			request('POST', '/property/billCollection/queryList.do', param, true, function(res) {
+				setData.dataList = res.data;
+			}, function() {
+				layer.msg("警报记录加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客社区访客</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/app.css?v=a088f059e3" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/suitphone.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/app.js?v=738ebb1c88"></script>
+		<script src="../js/jquery.qrcode.js"></script>
+		<script src="../js/utf.js"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="full-box fk-bg">
+				<div class="fk-con">
+					<div class="title-box fk-title-bg"></div>
+					<div class="fk-con-box">
+						<div class="con-top">
+							<div class="con-row">访问地址：<span class="text">{{fkinfo.memo}}</span></div>
+							<div class="fk-qrcode-box">
+								<div class="fk-qrcode-canvas"></div>
+							</div>
+						</div>
+						<div class="fk-line"></div>
+						<div class="con-bottom">
+							<div class="con-row">访问密码：</span><span class="text">{{fkinfo.pwd}}</span></div>
+							<div class="con-row">有效期：<span class="time">{{fkinfo.startTime | resetTime(3)}}</span> 至 <span class="time">{{fkinfo.endTime | resetTime(3)}}</span></div>
+						</div>
+					</div>
+				</div>
+				<div class="copy">&copy; 北京闪向科技有限公司</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.fkinfo = {};
+		loadVue(param);
+
+		function loadqr() {
+			var id = getQueryString('id');
+			var param = {
+				id: id
+			}
+			request('POST', '/property/visitor/queryById.do', param, true, function(res) {
+				setData.fkinfo = res.data;
+				$('.fk-qrcode-canvas').qrcode({
+					render: "canvas",
+					text: res.data.pwd,
+					width: "200",
+					height: "200",
+					background: "#fff",
+					foreground: "#000"
+				});
+			}, function(res) {
+				layer.msg("获取访客详情失败");
+			})
+		}
+		loadqr();
+	</script>
+
+</html>

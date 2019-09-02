@@ -1,0 +1,149 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">楼号</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="code" value="" placeholder="填写数字" class="required num num-box" />
+						<div class="unit96">号</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">单元数</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="units" placeholder="填写数字" class="required num num-box" />
+						<div class="unit96">个</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">楼层数</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="floors" placeholder="填写数字" class="required num num-box" />
+						<div class="unit96">层</div>
+					</div>
+				</div>
+				<div class="mask-list area-box">
+					<div class="mask-list-name"><span class="text">房屋面积</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="roomArea" placeholder="填写数字" class="num num-box" />
+						<div class="unit96">㎡</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">物业费单价</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="feeValue" disabled="disabled" class="required num num-box" />
+						<input type="hidden" name="" value="" id="feeId" class="required" />
+						<div class="unit96">元</div>
+					</div>
+					<div class="btn icon icon-select" onclick="selectFee('feeValue','feeId');">选择物业费</div>
+				</div>
+				<div class="mask-list c_b">
+					<div class="mask-list-name"><span>*</span><span class="text">创建房屋</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="auto" class="required" onchange="isAuto(this);">
+							<option value="">==请选择创建房屋==</option>
+							<option value="1">是</option>
+							<option value="0">否</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list house-per-floor-box hide-box">
+					<div class="mask-list-name"><span>*</span><span class="text">每层房屋数</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="housePerFloor" placeholder="填写数字" class="num num-box" />
+						<div class="unit96">个</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">备注</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" id="remark" class="layer-edit-box"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		function isAuto(t) {
+			if($(t).val() == "1") {
+				$(".house-per-floor-box").show();
+				$("#housePerFloor").addClass("required");
+			} else {
+				$(".house-per-floor-box").hide();
+				$("#housePerFloor").removeClass("required");
+			}
+		}
+
+		function selectFee() {
+			openMask('', "selectFee", "选择物业费", "98%", "98%", function(layerDom, layerIframe) {
+				var parentData = {
+					flag: 1,
+					feeValue: "feeValue",
+					feeId: "feeId"
+				}
+				layerIframe[0].contentWindow.loadData(parentData);
+			})
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				if(parseFloat($("#roomArea").val()) == 0) {
+					layer.msg("房屋面积不能为0");
+					return false;
+				}
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					code: $("#code").val(),
+					units: $("#units").val(),
+					floors: $("#floors").val(),
+					housePerFloor: $("#housePerFloor").val(),
+					auto: $("#auto").val(),
+					roomArea: $("#roomArea").val(),
+					feeId: $("#feeId").val(),
+					feeValue: $("#feeValue").val(),
+					remark: $("#remark").val()
+				};
+				request('POST', '/property/buildings/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					if(res.code == "0004") {
+						layer.msg("该楼宇已存在，请勿重复操作");
+					} else {
+						layer.msg('操作失败，请检查网络或重试');
+					}
+				})
+			}
+		}
+	</script>
+
+</html>

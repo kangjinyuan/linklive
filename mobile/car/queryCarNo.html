@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客智慧停车</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="full-box car-bg">
+				<div class="key-box hide-box key-province-box">
+					<div class='close-box'>
+						<div class="close" onclick="closekey();">
+							完成
+						</div>
+					</div>
+					<div class='num-box'>
+						<div class='key' v-for="t in item1">
+							<div class='key-in' v-on:click="selectProvinces(t);">{{t}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="key-box hide-box key-num-box">
+					<div class='close-box'>
+						<div class="close" onclick="closekey();">
+							完成
+						</div>
+					</div>
+					<div class='num-box'>
+						<div class='key' v-for="t in item2">
+							<div class='key-in' v-on:click="selectKeyNums(t,1)">{{t}}</div>
+						</div>
+						<div class='key key-del-box'>
+							<div class='key-in key-del' onclick="delCarNo();"></div>
+						</div>
+					</div>
+				</div>
+				<div class="car-box">
+					<div class="car-title-box">
+						<div class="car-title">欢迎使用邻客智慧停车服务</div>
+						<div class="car-dir">请输入有效的车牌号码</div>
+					</div>
+					<div class="car-comment-box">
+						<div class="car-comment-box-bg"></div>
+						<div class="car-query-box">
+							<div class="car-number-box">
+								<div class="car-number-text-box" v-for="(t,i) in carNoArr">
+									<span v-bind:class="selected == 0?'selected':''" v-if='i == 0' v-on:click="showProvinces();">{{t}}</span>
+									<span v-bind:class="selected == i?'selected':''" v-if="i != 0" v-on:click="showkeyNums(i);">{{t}}</span>
+									<span class="car-add" v-if='i == 7 && newEnergy == 1' v-on:click="setNewEnergy();">新能源</span>
+								</div>
+							</div>
+							<div class="car-btn" onclick="topay(this,0)">查询</div>
+						</div>
+						<div class="bbcar-bottom-box"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.item1 = ["京", "沪", "浙", "苏", "粤", "鲁", "晋", "冀", "豫", "川", "渝", "辽", "吉", "黑", "皖", "鄂", "津", "贵", "云", "桂", "琼", "青", "新", "藏", "蒙", "宁", "甘", "陕", "闽", "赣", "湘"];
+		param.item2 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Z", "X", "C", "V", "B", "N", "M"];
+		param.newEnergy = 1;
+		param.setKeyNumFlag = 0;
+		param.selected = -1;
+		param.carNoArr = ["", "", "", "", "", "", "", ""];
+		loadVue(param);
+
+		$(function() {
+			judeThirdPartyLogin(function() {});
+		})
+
+		// 去支付
+		function topay(t, flag) {
+			if(flag == 0) {
+				if(carno == "") {
+					layer.msg("请输入有效的车牌号");
+					return false;
+				}
+				if(setData.newEnergy == 1) {
+					if(carno.length < 7) {
+						layer.msg("请输入有效的车牌号");
+						return false;
+					}
+				} else if(setData.newEnergy == 0) {
+					if(carno.length < 8) {
+						layer.msg("请输入有效的新能源车牌号");
+						return false;
+					}
+				}
+			} else {
+				//setData.carselected = $(t).attr("data-index");
+				carno = $(t).text();
+			}
+
+			//			var param = {
+			//				carno: carno
+			//			}
+			//			request('POST', '/property/park/queryOrderBycarno.do', param,true, function(res) {
+			//				judeClient(function() {
+			//					var pageUrl = "carPay.html?payinfo=" + res.data;
+			//					getwxcode(pageUrl, 0)
+			//				},function(){
+			//					window.location.href = "carPay.html?payinfo=" + res.data;
+			//				})
+			//			}, function(res) {
+			//				layer.msg(res.msg);
+			//			})
+			judeThirdPartyLogin(function() {
+				judeClient(function() {
+					var pageUrl = host + "/linklive/mobile/carPay.html";
+					getwxcode(pageUrl, 0);
+				}, function() {
+					window.location.href = "carPay.html?payinfo=" + res.data;
+				}, function() {
+					window.location.href = "carPay.html?payinfo=" + res.data;
+				})
+			});
+		}
+		//		var param = {
+		//			id: roomInfo.id,
+		//			accessCode: accessCode,
+		//			fee: parseFloat($("#fee").val()) * 100,
+		//			feeName: setData.feeName
+		//		}
+		//		request('POST', '/pay/wx/payFee.do', param,true, function(res) {
+		//			var res = res;
+		//			judeClient(function() {
+		//				WeixinJSBridge.invoke(
+		//					'getBrandWCPayRequest', {
+		//						"appId": res.data.appId,
+		//						"timeStamp": res.data.timeStamp,
+		//						"nonceStr": res.data.nonceStr,
+		//						"package": res.data.package,
+		//						"signType": "MD5",
+		//						"paySign": res.data.paySign
+		//					},
+		//					function(res) {
+		//						if(res.err_msg == "get_brand_wcpay_request:ok") {
+		//							layer.msg("支付成功", {
+		//								time: 2000
+		//							}, function() {
+		//								window.location.href = "pay_result.html?pay_flag=ok";
+		//							});
+		//						} else if(res.err_msg == "get_brand_wcpay_request:cancel") {
+		//							layer.msg("取消支付", {
+		//								time: 2000
+		//							}, function() {
+		//								goBack(-1);
+		//							});
+		//						} else if(res.err_msg == "get_brand_wcpay_request:fail") {
+		//							layer.msg("支付失败", {
+		//								time: 2000
+		//							}, function() {
+		//								window.location.href = "pay_result.html?pay_flag=fail";
+		//							});
+		//						}
+		//					}
+		//				);
+		//			}, function() {
+		//				var timestamp = new Date();
+		//				var biz_content = {
+		//					"subject": res.data.subject,
+		//					"out_trade_no": res.data.out_trade_no,
+		//					"timeout_express": "90m",
+		//					"total_amount": res.data.total_amount,
+		//					"product_code": res.data.product_code
+		//				}
+		//				biz_content = JSON.stringify(biz_content);
+		//				var requestUrl = "https://openapi.alipay.com/gateway.do?timestamp=" + resetTime(timestamp, 0) + "&method=alipay.trade.wap.pay&app_id=" + res.data.app_id + "&sign_type=RSA2&sign=" + res.data.sign + "&version=1.0&biz_content=" + biz_content
+		//				var alipayparam = {};
+		//				request('POST', requestUrl, alipayparam,true, function(res) {
+		//					layer.msg("支付成功");
+		//				}, function(res) {
+		//					layer.msg("支付失败");
+		//				});
+		//			}, function() {
+		//				window.location.href = res.data;
+		//			})
+		//		}, function(res) {
+		//			window.location.href = "pay_result.html?pay_flag=fail";
+		//		})
+	</script>
+
+</html>

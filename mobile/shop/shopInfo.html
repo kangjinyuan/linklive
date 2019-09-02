@@ -1,0 +1,394 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>商品详情</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/swiper.min.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/swiper.min.js"></script>
+		<script src="../../js/photoloadinit.js"></script>
+		<script src="../../js/photoload.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app app-shop-padding-bottom VDOM" v-cloak>
+			<!--轮播图-->
+			<div class="banner">
+				<div class="swiper-container">
+					<ul class="swiper-wrapper">
+						<li v-for="t in commodityInfo.bannerList" class="swiper-slide">
+							<a><img v-bind:src="t" onerror="this.src='../../img/no-img.png'" /></a>
+						</li>
+					</ul>
+					<!-- 分页器 -->
+					<div class="swiper-pagination"></div>
+				</div>
+			</div>
+			<div class="main" v-if="commodityInfo.groupBuyDetail">
+				<div class="list-box">
+					<div class="group-info-box">
+						<div class="group-info">
+							<div class="group-people">{{commodityInfo.groupBuyDetail.groupNeed}}份成团，已参团{{commodityInfo.salesVolume}}份</div>
+						</div>
+						<div class="group-time" v-if="timeSlot">距离活动结束还剩{{timeSlot}}</div>
+					</div>
+					<div class="shop-info">
+						<div class="shop-price">￥<span class="sellPrice">{{commodityInfo.finalPrice}}</span><span class="costPrice">￥{{commodityInfo.originPrice}}</span></div>
+						<div class="shop-title">{{commodityInfo.name}}</div>
+					</div>
+				</div>
+				<div class="list-box">
+					<div class="shop-rule-box">
+						<div class="shop-rule" onclick="skipPage(0);">
+							<div class="shop-rule-title">商品保障</div>
+							<div class="shop-rule-con">
+								<span v-if="t.checked == true" v-for="(t,i) in commodityInfo.guarantee"><span v-if="i > 0">·</span>{{t.title}}</span>
+							</div>
+							<div class="more"></div>
+						</div>
+					</div>
+					<div class="shop-rule-box">
+						<div class="shop-rule" onclick="skipPage(1);">
+							<div class="shop-rule-title">拼团规则</div>
+							<div class="shop-rule-con">参团·邀请好友·成团发货</div>
+							<div class="more"></div>
+						</div>
+					</div>
+				</div>
+				<div class="list-box" v-if="commentList.length > 0">
+					<div class="list-title-box">
+						<div class="list-title">
+							宝贝评价（{{count}}）
+							<div class="see-more" onclick="skipPage(2);">
+								查看全部
+								<div class="more"></div>
+							</div>
+						</div>
+					</div>
+					<ul class="comment-box">
+						<li v-for="t in commentList">
+							<div class="comment-title">
+								<div class="user-info">
+									<div class="head-img">
+										<img v-bind:src="t.headImage" onerror="this.src='../../img/no-img.png'" />
+									</div>
+									<div class="user-name">{{t.nickName}}</div>
+								</div>
+								<div class="comment-time">{{t.createTime | resetTime(3)}}</div>
+							</div>
+							<div class="comment-con">
+								<div class="comment-con-text">
+									{{t.content}}
+								</div>
+								<div class="comment-con-img" v-if="t.imageList.length > 0">
+									<img v-for="image in t.imageList" v-bind:src="image+'?imageView2/1/w/220/h/220'" v-on:click="previewImage(image);" onerror="this.src='../../img/no-img.png'" />
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="list-box">
+					<div class="list-title-box">
+						<div class="list-title">
+							宝贝详情
+						</div>
+					</div>
+					<div class="shop-introduce">
+						<img v-for="t in commodityInfo.detailList" v-bind:src="t" onerror="this.src='../../img/no-img.png'" />
+					</div>
+				</div>
+			</div>
+			<div class="no-more-box">没有更多了呦~</div>
+			<div class="pay-box">
+				<div v-if="timeSlot" class="pay-btn" onclick="showDom('rule-box');">立即参团</div>
+				<div v-else class="pay-btn disabled-btn">已结束</div>
+			</div>
+			<div class="rule-box hide-box">
+				<div class="rule">
+					<div class="rule-colse" onclick="showDom('rule-box');"></div>
+					<div class="list-box">
+						<div class="list">
+							<div class="list-con">
+								<div class="shop-img">
+									<img v-bind:src="skuImage" onerror="this.src='../../img/no-img.png'" />
+								</div>
+								<div class="rule-shop-info">
+									<div class="text price">￥{{skuPrice}}</div>
+									<div class="text">库存：{{skuStock}}件</div>
+									<div v-if="combinationed.length > 0" class="text">已选：<span v-for="t in combinationed">{{t}}</span></div>
+									<div v-else class="text">请选择：<span v-for="t in combination">{{t}}</span></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="rule-select-box" v-if="attributeList.length > 0">
+						<div class="list-box" v-for="ppt in attributeList">
+							<div class="list">
+								<div class="list-con">
+									<div class="list-con-title">{{ppt.name}}</div>
+									<ul class="classift-list" v-if="ppt.attributes.length > 0">
+										<li v-for="(pt,i) in ppt.attributes" v-bind:data-id="ppt.id" v-bind:data-index="i" v-on:click="selectAttribute($event);">{{pt}}</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="list-box">
+							<div class="list">
+								<div class="list-con">
+									<div class="list-con-title">
+										购买数量
+									</div>
+									<div class="buy-num">
+										<div v-bind:class="['reduce',quantity==1?'reduceNoClick':'']" onclick="addOrReduce(1);">-</div>
+										<div class="num">{{quantity}}</div>
+										<div class="add" onclick="addOrReduce(0);">+</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="rule-btn-box">
+						<div class="rule-btn" onclick="jsToApp('5', '');">确定</div>
+					</div>
+				</div>
+			</div>
+			<div class="share-box hide-box">
+				<div class="share">
+					<ul class="select-share-way">
+						<li onclick="share('0');">
+							<div class="icon icon-wx-friend"></div>
+							<div class="text">微信好友</div>
+						</li>
+						<li onclick="share('1');">
+							<div class="icon icon-wx-circleOfFriend"></div>
+							<div class="text">朋友圈</div>
+						</li>
+					</ul>
+					<div class="close" onclick="showDom('share-box')">取消</div>
+				</div>
+			</div>
+			<div class="full-img-box hide-box" onclick="showDom('full-img-box');">
+				<img src="" />
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			getScrollTop();
+		})
+		var skuInfo = "";
+		param.timeSlot = "";
+		param.commentList = [];
+		param.attributeList = [];
+		param.skuList = [];
+		param.commodityInfo = {};
+		param.skuImage = "";
+		param.skuPrice = "";
+		param.skuStock = "";
+		param.combination = [];
+		param.combinationed = [];
+		param.quantity = 1;
+		loadVue(param);
+
+		function banner() {
+			var mySwiper = new Swiper('.swiper-container', {
+				direction: 'horizontal',
+				loop: true,
+				autoplay: 3000,
+				speed: 300,
+				autoplayDisableOnInteraction: false,
+				// 如果需要分页器
+				pagination: {
+					el: '.swiper-pagination',
+					type: 'fraction'
+				},
+				paginationClickable: true,
+			})
+		}
+
+		function share(flag) {
+			var data = flag;
+			jsToApp("1", data, function() {
+				showDom("share-box");
+			});
+		}
+
+		function setOrder() {
+			var commodityInfo = setData.commodityInfo;
+			var combination = setData.combination;
+			var combinationed = setData.combinationed;
+			var quantity = setData.quantity;
+			if(combination.length != combinationed.length) {
+				layer.msg("请选择商品属性");
+				return false;
+			}
+			if(skuInfo == "") {
+				layer.msg("商品库存为0");
+				return false;
+			}
+
+			if(quantity > skuInfo.stock) {
+				layer.msg("购买数量大于库存");
+				return false;
+			}
+
+			var orderList = [];
+			orderInfo = {
+				agencyId: commodityInfo.agencyId,
+				agencyName: commodityInfo.agencyName
+			}
+
+			var skuList = [];
+			skuInfo.combinationList = skuInfo.combination.split(" ");
+			var param = {
+				skuInfo: skuInfo,
+				quantity: quantity
+			}
+
+			skuList.push(param);
+			orderInfo.skuList = skuList;
+			orderList.push(orderInfo);
+			orderList = encodeURIComponent(JSON.stringify(orderList));
+			window.location.href = "billOrder.html?bill_flag=0&orderList=" + orderList;
+		}
+
+		function skipPage(flag) {
+			var commodityInfo = setData.commodityInfo;
+			if(flag == 0) {
+				var guarantee = encodeURIComponent(JSON.stringify(commodityInfo.guarantee))
+				window.location.href = "guarantee.html?guarantee=" + guarantee;
+			} else if(flag == 1) {
+				window.location.href = "groupRule.html";
+			} else if(flag == 2) {
+				window.location.href = "comment.html?commodityId=" + commodityInfo.id;
+			}
+		}
+
+		function loadAttribute(commodityId) {
+			var param = {
+				commodityId: commodityId
+			}
+			request('POST', '/shop/commodity/attribute/queryList.do', param, true, function(res) {
+				var attributeList = res.data;
+				for(var i = 0; i < attributeList.length; i++) {
+					setData.combination.push(attributeList[i].name);
+				}
+				setData.attributeList = res.data;
+			}, function(res) {
+				layer.msg("商品属性加载失败");
+			})
+		}
+
+		function loadSku(commodityId) {
+			var param = {
+				commodityId: commodityId,
+				pageSize: "10000"
+			}
+			request('POST', '/shop/commodity/sku/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].price = parseFloat(dataList[i].price).toFixed(2);
+					dataList[i].image = imgUrl + dataList[i].image;
+				}
+				setData.skuList = dataList;
+			}, function(res) {
+				layer.msg("单品加载失败");
+			})
+		}
+
+		function loadComment(commodityId) {
+			var param = {
+				commodityId: commodityId,
+				orderByTime: "0",
+				page: page
+			}
+			request('POST', '/shop/comment/queryList.do', param, true, function(res) {
+				var commentList = res.data;
+				for(var i = 0; i < commentList.length; i++) {
+					commentList[i].headImage = imgUrl + commentList[i].headImage;
+					var imageList = [];
+					for(var j = 0; j < 3; j++) {
+						var image = eval("commentList[i].image" + j);
+						if(image != "") {
+							imageList.push(imgUrl + image);
+						}
+					}
+					commentList[i].imageList = imageList;
+				}
+				setData.commentList = commentList.slice(0, 3);
+			}, function(res) {
+				layer.msg("评价加载失败，请检查网络或重试");
+			})
+		}
+
+		function loadData(id) {
+			var param = {
+				id: id
+			}
+			request('POST', '/shop/commodity/queryList.do', param, true, function(res) {
+				var commodityInfo = res.data[0];
+				if(commodityInfo.groupBuyDetail) {
+					setData.timeSlot = getTimeSlot(commodityInfo.groupBuyDetail.deadLineTime);
+					loadTimeSlot(commodityInfo.groupBuyDetail.deadLineTime);
+				}
+				commodityInfo.originPrice = parseFloat(commodityInfo.originPrice).toFixed(2);
+				commodityInfo.finalPrice = parseFloat(commodityInfo.finalPrice).toFixed(2);
+				var bannerList = [];
+				for(var i = 0; i < 5; i++) {
+					var image = eval("commodityInfo.image" + i);
+					if(image != "") {
+						bannerList.push(imgUrl + image);
+					}
+				}
+				commodityInfo.bannerList = bannerList;
+				var detailList = [];
+				for(var i = 0; i < 5; i++) {
+					var detail = eval("commodityInfo.detail" + i);
+					if(detail != "") {
+						detailList.push(imgUrl + detail);
+					}
+				}
+				commodityInfo.detailList = detailList;
+				var guarantee = JSON.parse(commodityInfo.guarantee)
+				guarantee.sort(resetSort("sort", 1));
+				commodityInfo.guarantee = guarantee;
+				setData.skuImage = imgUrl + commodityInfo.image0;
+				setData.skuStock = commodityInfo.totalStock;
+				setData.skuPrice = commodityInfo.finalPrice;
+				setData.commodityInfo = commodityInfo;
+				loadAttribute(id);
+				loadComment(id);
+				loadSku(id);
+				jsToApp("0", ["0"]);
+				setScrollTop();
+			}, function(res) {
+				layer.msg("商品加载失败");
+			})
+		}
+
+		function appToJs(data) {
+			getAppData(data);
+		}
+	</script>
+
+</html>

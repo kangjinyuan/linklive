@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>支付方式</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="main">
+				<div class="pay-way-box">
+					<div class="pay-price">订单金额：{{orderInfo.totalFee}}元</div>
+					<ul class="pay-way">
+						<li onclick="pay('0');">
+							<div class="pay-way icon-alipy">支付宝支付</div>
+							<div class="more"></div>
+						</li>
+						<li onclick="pay('1');">
+							<div class="pay-way icon-wx">微信支付</div>
+							<div class="more"></div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		param.orderInfo = "";
+		loadVue(param);
+
+		function pay(flag) {
+			var orderInfo = setData.orderInfo;
+			var data = {
+				id: orderInfo.id,
+				payFlag: flag
+			}
+			jsToApp("2", data);
+		}
+
+		function payResult(payResult) {
+			if(payResult == "ok") {
+				window.location.href = "pay_result.html?pay_flag=ok";
+			} else if(payResult == "cancel") {
+				jsToApp("3", "0");
+			} else if(payResult == "fail") {
+				window.location.href = "pay_result.html?pay_flag=fail";
+			}
+		}
+
+		function loadData() {
+			var orderInfo = JSON.parse(decodeURIComponent(getQueryString("orderInfo")));
+			orderInfo.totalFee = parseFloat(orderInfo.totalFee).toFixed(2);
+			setData.orderInfo = orderInfo;
+			nextTick(function() {
+				var data = {
+					pageType: "0",
+					value: "0"
+				}
+				jsToApp("6", data);
+			})
+		}
+
+		function appToJs(data) {
+			getAppData(data);
+		}
+
+		loadData();
+	</script>
+
+</html>

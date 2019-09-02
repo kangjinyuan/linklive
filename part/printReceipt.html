@@ -1,0 +1,127 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<!--[if lt IE 9]>
+        <script src="../js/print/html5-3.6-respond-1.1.0.min.js"></script>
+        <![endif]-->
+		<script src="../js/print/jQuery.print.min.js"></script>
+		<script src="../js/ChinaNumToEnglishNum.js?v=6befab4557"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom VDOM" v-cloak>
+			<div class="receipt-box" id="receipt">
+				<div class="receipt-title-box">
+					<div class="receipt-title">收款收据</div>
+					<div class="receipt-no">No:{{billInfo.receiptCode}}</div>
+				</div>
+				<div class="receipt-date">收款日期：{{billInfo.payTime | resetTime(9)}}</div>
+				<div class="receipt-con">
+					<div class="receipt-list">
+						<div class="receipt-name">收款单位</div>
+						<div class="receipt-value">{{billInfo.receivingUnit}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">付款人</div>
+						<div class="receipt-value">{{billInfo.communityName}}{{billInfo.address}}{{billInfo.ownerName}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">收费事由</div>
+						<div class="receipt-value">{{billInfo.scheduleName?billInfo.scheduleName:billInfo.remark}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">收款方式</div>
+						<div class="receipt-value">{{billInfo.payPlatformText}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">金额（小写）</div>
+						<div class="receipt-value">￥{{billInfo.fee}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">金额（大写）</div>
+						<div class="receipt-value">人民币{{billInfo.chineseFee}}</div>
+					</div>
+					<div class="receipt-list">
+						<div class="receipt-name">收款单位（盖章）</div>
+						<div class="receipt-value"></div>
+					</div>
+				</div>
+				<ul class="receipt-person">
+					<li>核准：</li>
+					<li>会计：</li>
+					<li>记账：</li>
+					<li>出纳：</li>
+					<li>经手人：</li>
+				</ul>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-print" onclick="consumeCode();" id="creatsave">打印</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.billInfo = {};
+		loadVue(param);
+
+		function consumeCode() {
+			var param = {};
+			request('POST', '/property/receipt/consumeCode.do?communityId=' + communityInfo.id, param, true, function(res) {
+				print('receipt');
+				parent.layer.close(index);
+			}, function() {
+				layer.msg("打印失败");
+			})
+		}
+
+		function loadBill(billInfo) {
+			var param = {
+				id: billInfo.roomId
+			};
+			request('POST', '/property/rooms/queryList.do', param, true, function(res) {
+				var roomInfo = res.data[0];
+				var param = {};
+				request('POST', '/property/receipt/queryCode.do?communityId=' + communityInfo.id, param, true, function(res) {
+					var timestamp = new Date().getTime();
+					var receiptCode = res.data;
+					$.getJSON("../json/community.json?timestamp=" + timestamp, function(res) {
+						billInfo.receivingUnit = communityInfo.pmcName;
+						billInfo.receiptCode = receiptCode;
+						billInfo.ownerName = roomInfo.ownerName;
+						billInfo.ownerId = roomInfo.ownerId;
+						billInfo.chineseFee = chineseNumber(billInfo.fee);
+						for(var i = 0; i < res.length; i++) {
+							if(res[i].id == communityInfo.id) {
+								billInfo.receivingUnit = res[i].receivingUnit;
+							}
+						}
+						setData.billInfo = billInfo;
+					})
+				}, function() {
+					layer.msg("获取收据编号失败");
+				})
+			}, function() {
+				layer.msg("房屋详情加载失败");
+			})
+		}
+	</script>
+
+</html>

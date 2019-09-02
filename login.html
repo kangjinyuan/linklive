@@ -1,0 +1,45 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/login.css?v=f5e16cdc44" />
+		<script src="js/jquery-1.9.1.min.js"></script>
+		<script src="js/postUrl.js?v=2f85f2877b"></script>
+		<script src="js/common.js?v=e0666996b7"></script>
+		<script src="layui/layui.all.js"></script>
+		<script src="js/login.js?v=9f8fb3fea3"></script>
+	</head>
+
+	<body>
+		<div id="login">
+			<div class="login">
+				<div class="title">邻客社区平台</div>
+				<div class="login-input">
+					<div class="icon icon-user"></div><input type="text" value="" name="" id="username" placeholder="账号" /></div>
+				<div class="login-input">
+					<div class="icon icon-password"></div><input type="password" value="" name="" id="password" placeholder="密码" /></div>
+				<div class="login-validate-box">
+					<div class="login-validate-text f_r" id="checkCode" onclick="createCode()"></div>
+					<div class="login-validate-input f_l">
+						<div class="icon icon-token"></div><input type="text" value="" name="" id="validate" placeholder="验证码" /></div>
+				</div>
+				<div class="login-btn" id="login_btn">登录</div>
+				<div class="copyright">copyright &copy; 北京闪向科技有限公司</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		createCode();
+	</script>
+
+</html>

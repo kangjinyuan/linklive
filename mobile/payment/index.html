@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>在线缴费</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="c-box">
+				<div class="setnumber-box box-shadow">
+					<div class="number-box">
+						<input type="number" name="" v-bind:value="telephone" id="telephone" placeholder="请输入业主手机号" oninput="saveTelephone();" />
+					</div>
+					<div class="number-box" v-if="dataList.length > 0">
+						<ul class="payment-box">
+							<li v-for="t in dataList" v-on:click="pay(t.code);">
+								<div v-bind:class="['icon-payment',t.iconClass]">
+									<div v-if="t.count > 0" v-bind:class="['count',t.count < 10?'count-circle':'']">{{t.count}}</div>
+								</div>
+								<div class="payment-text">{{t.name}}</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			judeThirdPartyLogin(function() {
+				getCommunityInfo();
+			});
+		})
+
+		param.telephone = window.localStorage.getItem("telephone");
+		loadVue(param);
+
+		function saveTelephone() {
+			window.localStorage.setItem("telephone", $("#telephone").val());
+		}
+
+		function getCommunityInfo() {
+			var id = getQueryString("communityId");
+			if(communityInfo) {
+				if(communityInfo.id != id) {
+					window.localStorage.setItem("roomInfo", "");
+				}
+			}
+			var param = {
+				id: id
+			}
+			request("POST", "/property/community/queryList.do", param, true, function(res) {
+				var communityInfo = JSON.stringify(res.data[0]);
+				window.localStorage.setItem("communityInfo", communityInfo);
+				getFee();
+			}, function(res) {
+				layer.msg("社区详情加载失败");
+			})
+		}
+
+		function getFee() {
+			var param = {}
+			request("POST", "/property/fee/feeList.do", param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i].code == "1") {
+						dataList[i].name = "物业费";
+						dataList[i].iconClass = "icon-property";
+					} else if(dataList[i].code == "2") {
+						dataList[i].name = "水费";
+						dataList[i].iconClass = "icon-water";
+					} else if(dataList[i].code == "3") {
+						dataList[i].name = "电费";
+						dataList[i].iconClass = "icon-electric";
+					} else if(dataList[i].code == "4") {
+						dataList[i].name = "车位管理费";
+						dataList[i].iconClass = "icon-car";
+					} else if(dataList[i].code == "5") {
+						dataList[i].name = "固定停车费";
+						dataList[i].iconClass = "icon-fixed-parking";
+					} else if(dataList[i].code == "6") {
+						dataList[i].name = "临时停车费";
+						dataList[i].iconClass = "icon-temporary-parking";
+					} else if(dataList[i].code == "7") {
+						dataList[i].name = "生活垃圾处理费";
+						dataList[i].iconClass = "icon-domestic-garbage";
+					} else if(dataList[i].code == "8") {
+						dataList[i].name = "储藏间管理费";
+						dataList[i].iconClass = "icon-storage-room";
+					} else if(dataList[i].code == "9") {
+						dataList[i].name = "房租";
+						dataList[i].iconClass = "icon-rent";
+					} else if(dataList[i].code == "10") {
+						dataList[i].name = "供暖费";
+						dataList[i].iconClass = "icon-heating";
+					}
+				}
+				setData.dataList = dataList;
+			}, function(res) {
+				layer.msg("缴费项目加载失败");
+			});
+		}
+
+		function findRoomsByTelephone(callback) {
+			var param = {
+				telephone: $("#telephone").val()
+			}
+			request('POST', '/property/rooms/findRoomsByTelephone.do', param, true, function(res) {
+				var dataList = res.data;
+				if(dataList.length == 0) {
+					layer.msg("您还没有绑定房屋，请联系物业");
+				} else {
+					callback(dataList);
+				}
+			}, function(res) {
+				if(res.code == "0005") {
+					layer.msg("手机号不存在，请核对手机号是否正确");
+				} else {
+					layer.msg("房屋列表查询失败，请检查您的网络或重试");
+				}
+			})
+		}
+
+		function pay(code) {
+			if($("#telephone").val() == "") {
+				layer.msg("请输入业主手机号");
+				return false;
+			}
+			if(!regular_phone.test($("#telephone").val())) {
+				layer.msg("业主手机号格式错误");
+				return false;
+			}
+			if(code == "1") {
+				findRoomsByTelephone(function() {
+					window.location.href = "addPropertyBill.html?telephone=" + $("#telephone").val()
+				});
+			} else {
+				jumpGd($("#telephone").val(), code);
+			}
+		}
+	</script>
+
+</html>

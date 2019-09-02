@@ -1,0 +1,349 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../layui/css/modules/layer/default/layer.css" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.js"></script>
+		<script src="../layui/lay/modules/layer.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">监控管理</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">检索条件：</div>
+						<div class="search-value">
+							<select name="" id="" onchange="searchCategory(this);">
+								<option value="">==请选择检索条件==</option>
+								<option value="0">人脸检索</option>
+								<option value="1">人体检索</option>
+								<option value="2">行为分析</option>
+								<option value="3">车辆检索</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0'">
+						<div class="search-name">人员姓名：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" placeholder="输入人员姓名" />
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0' || searchCategory == '1'">
+						<div class="search-name">年龄段：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择年龄段==</option>
+								<option value="0">婴幼儿</option>
+								<option value="1">儿童</option>
+								<option value="2">少年</option>
+								<option value="3">青少年</option>
+								<option value="4">青年</option>
+								<option value="5">壮年</option>
+								<option value="6">中年</option>
+								<option value="7">中老年</option>
+								<option value="8">老年</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0' || searchCategory == '1'">
+						<div class="search-name">性别：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择性别==</option>
+								<option value="0">男</option>
+								<option value="1">女</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '1'">
+						<div class="search-name">上衣颜色：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择上衣颜色==</option>
+								<option value="0">白色</option>
+								<option value="1">银色</option>
+								<option value="2">灰色</option>
+								<option value="3">黑色</option>
+								<option value="4">红色</option>
+								<option value="5">深蓝色</option>
+								<option value="6">蓝色</option>
+								<option value="7">黄色</option>
+								<option value="8">绿色</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0' || searchCategory == '1'">
+						<div class="search-name">是否戴眼镜：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择是否戴眼镜==</option>
+								<option value="1">是</option>
+								<option value="0">否</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0'">
+						<div class="search-name">是否微笑：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择是否微笑==</option>
+								<option value="1">是</option>
+								<option value="0">否</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '0'">
+						<div class="search-name">是否戴口罩：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择是否戴口罩==</option>
+								<option value="1">是</option>
+								<option value="0">否</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '1'">
+						<div class="search-name">是否背包：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择是否背包==</option>
+								<option value="1">是</option>
+								<option value="0">否</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '1'">
+						<div class="search-name">是否骑车：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择是否骑车==</option>
+								<option value="1">是</option>
+								<option value="0">否</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '2'">
+						<div class="search-name">事件类别：</div>
+						<div class="search-value">
+							<select name="" id="">
+								<option value="">==请选择事件类别==</option>
+								<option value="0">穿越警戒线报警</option>
+								<option value="1">区域入侵报警</option>
+								<option value="2">物品遗留报警</option>
+								<option value="3">物品拿取报警</option>
+								<option value="4">进入区域报警</option>
+								<option value="5">离开区域报警</option>
+								<option value="6">停车报警</option>
+								<option value="7">徘徊报警</option>
+								<option value="8">人员聚集报警</option>
+							</select>
+						</div>
+					</div>
+					<div class="search" v-if="searchCategory == '3'">
+						<div class="search-name">车牌号：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" placeholder="输入车牌号" />
+						</div>
+					</div>
+				</div>
+				<div class="search-time">
+					<div class="search">
+						<div class="search-name">拍摄时间：</div>
+						<div class="search-value-box">
+							<div class="search-value">
+								<input type="text" name="" value="" id="startTime" />
+							</div>
+							<div class="time-cut">至</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="endTime" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="opera-main-box">
+					<div class="opera-main-list-box opera-main-left-box">
+						<div class="opera-main-list-inner-box">
+							<div class="layui-collapse">
+								<div class="layui-colla-item" v-for="t in dataList">
+									<h2 class="layui-colla-title">{{t.code}}号楼</h2>
+									<div v-bind:class="['layui-colla-content',t.isActive?'layui-show':'']">
+										<ul class="data-list-box">
+											<li v-for="t in t.childList">{{t.name}}</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="opera-main-list-box opera-main-right-box">
+						<div class="opera-main-list-inner-box">
+							<div class="opera-main-content-box">
+								<div class="full-box">
+									<div class="img-box">
+										<div v-bind:title="t.name" v-bind:class="['marker','marker-video-surveillance', t.state == 0?'marker-video-surveillance-disabled':'']" v-for="t in markerList" v-bind:style="'top:'+t.offsetY+'px;left:'+t.offsetX+'px'" v-on:click="showVideoMaster(1,event,t,'编辑监控');"></div>
+										<img id="planImg" src="../img/shanxiang-pingmiantu.png" alt="" onclick="showVideoMaster(0,event,'','新建监控');" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--<div class="page-box"></div>-->
+		</div>
+	</body>
+	<script>
+		$(function() {
+			setTime('#startTime', "date");
+			setTime('#endTime', "date");
+		})
+		param.searchCategory = "";
+		param.markerList = [{
+				id: "1",
+				channel: "1",
+				name: "监控球机",
+				videoUrl: "/hls/channel1.m3u8",
+				state: "1",
+				offsetX: "100",
+				offsetY: "100"
+			},
+			{
+				id: "2",
+				channel: "2",
+				name: "监控球机热成像",
+				videoUrl: "/hls/channel2.m3u8",
+				state: "0",
+				offsetX: "100",
+				offsetY: "200"
+			},
+			{
+				id: "3",
+				channel: "3",
+				name: "监控枪机",
+				videoUrl: "/hls2/channel1.m3u8",
+				state: "1",
+				offsetX: "200",
+				offsetY: "450"
+			},
+			{
+				id: "4",
+				channel: "4",
+				name: "监控枪机热成像",
+				videoUrl: "/hls2/channel2.m3u8",
+				state: "1",
+				offsetX: "100",
+				offsetY: "300"
+			}
+		]
+		loadVue(param);
+
+		function showVideoMaster(flag, e, obj, title) {
+			e = e || window.event;
+			var count = setData.count;
+			var channelCount = setData.channelCount;
+			if(obj.channel) {
+				var channel = obj.channel;
+			} else {
+				var channel = count + 1;
+			}
+			if(obj.offsetX) {
+				var offsetX = obj.offsetX;
+				var offsetY = obj.offsetY;
+			} else {
+				var offsetX = e.offsetX;
+				var offsetY = e.offsetY;
+			}
+			if(count == channelCount) {
+				layer.msg("监控设别已经达到上限，如想继续添加，请联系闪向");
+				return false;
+			}
+			openMask(obj.id, "../part/surveillance", title, "338px", "376px", function(layerDom, layerIframe) {
+				layerDom.find("#offsetX").val(offsetX);
+				layerDom.find("#offsetY").val(offsetY);
+				layerDom.find("#channel").val(channel);
+				layerDom.find("#channel").val(channel);
+				layerDom.find("#record").val(obj.record);
+				layerDom.find("#name").val(obj.name);
+				layerDom.find("#code").val(obj.code);
+				layerDom.find("#ipAddress").val(obj.ipAddress);
+				layerDom.find("#loginName").val(obj.loginName);
+				layerDom.find("#loginPassword").val(obj.loginPassword);
+				layerDom.find("#location").val(obj.location);
+				layerDom.find("#deviceType").val(obj.deviceType);
+				layerDom.find("#audio").val(obj.audio);
+				judeEdit(flag, layerDom);
+			})
+		}
+
+		function searchCategory(t) {
+			setData.searchCategory = $(t).val();
+		}
+
+		function setlayui() {
+			layui.use(['element', 'layer', 'layedit', 'laydate'], function() {
+				var element = layui.element;
+			});
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				pageSize: "10000"
+			};
+			request('POST', '/property/buildings/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var a = 0; a < dataList.length; a++) {
+					dataList[a].isActive = false;
+					dataList[a].childList = [];
+					var code = dataList[a].code;
+					var units = dataList[a].units;
+					var floors = dataList[a].floors;
+					for(var b = 0; b < units; b++) {
+						for(var c = 0; c < floors; c++) {
+							var obj = {
+								id: code + "-" + (b + 1) + "-" + (c + 1),
+								name: (b + 1) + "单元" + (c + 1) + "层"
+							}
+							dataList[a].childList.push(obj);
+						}
+					}
+				}
+				dataList[0].isActive = true;
+				setData.dataList = dataList;
+				nextTick(function() {
+					setlayui();
+				})
+			}, function(res) {
+				layer.msg("楼宇加载失败");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

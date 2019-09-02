@@ -1,0 +1,86 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main_mask">
+			<div class="con">
+				<div class="masklist">
+					<div class="masklistname"><span>*</span><span class="text">报修类别icon</span>：</div>
+					<div class="masklistvalue">
+						<img src="" alt="" id="showImage" onerror="this.src='../img/no-img.png'" class="required-img" />
+						<div class="btn margintop8" onclick="uploadimg(this);">本地上传</div>
+					</div>
+				</div>
+				<form method="post" action="" enctype="multipart/form-data" id="coverImage" style="display: none;">
+					<input type="file" name="file" id="ImageFile" value="" onchange="subimtimgBtn();" />
+				</form>
+				<div class="masklist">
+					<div class="masklistname"><span>*</span><span class="text">报修类别名称</span>：</div>
+					<div class="masklistvalue">
+						<input type="text" name="" id="name" value="" class="required" />
+					</div>
+				</div>
+				<div class="masklist">
+					<div class="masklistname"><span>*</span><span class="text">是否显示</span>：</div>
+					<div class="masklistvalue">
+						<select name="" id="" class="required">
+							<option value="">==请选择是否显示==</option>
+							<option value="0">是</option>
+							<option value="1">否</option>
+						</select>
+					</div>
+				</div>
+				<div class="masklist">
+					<div class="masklistname"><span class="text">备注</span>：</div>
+					<div class="masklistvalue">
+						<textarea name="" rows="" cols=""></textarea>
+					</div>
+				</div>
+				<div class="maskbtnbox">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var param = {
+					id: $(".main_mask").attr("data-id"),
+					name: $("#name").val(),
+					charger: $("#charger").val(),
+					chargerTelephone: $("#chargerTelephone").val(),
+					account: $("#account").val(),
+					description: $("#description").val()
+				};
+				request('POST', '/property/pmc/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				})
+			}
+		}
+	</script>
+
+</html>

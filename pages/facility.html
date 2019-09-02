@@ -1,0 +1,195 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/jquery.qrcode.js"></script>
+		<script src="../js/utf.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">设施管理</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">设施名称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="facilityName" placeholder="输入设施名称" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">设施编码：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="facilityCode" placeholder="输入设施编码" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">设施类别：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="facilityCategoryName" placeholder="输入设施类别" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">设施状态：</div>
+						<div class="search-value">
+							<select name="" id="state" onchange="sreach();">
+								<option value="">==请选择设施状态==</option>
+								<option value="1">启用</option>
+								<option value="0">禁用</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div v-if="facilityCategoryList.length > 0" class="btn icon icon-add" onclick="showFacility(0,'','新建设施')">新建设施</div>
+				<div class="btn icon icon-del" onclick="del();">删除</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有设施哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<tr>
+								<th class="padding20">
+									<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+								<th>设施名称</th>
+								<th>设施编码</th>
+								<th>设施类别</th>
+								<th>设施地址</th>
+								<th>设施状态</th>
+								<th>二维码</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<tr v-for="(t,i) in dataList">
+								<td class="padding20">
+									<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.facilityName}}</td>
+								<td>{{t.facilityCode}}</td>
+								<td>{{t.facilityCategoryName}}</td>
+								<td>{{t.addressDescription}}</td>
+								<td>{{t.stateText}}</td>
+								<td>
+									<div class="download-scan-code-box" v-bind:class="'scanCode'+t.id">
+										<a href="" v-bind:class="['downloadScanCode', 'downloadScanCode'+t.id]" v-bind:download="t.facilityName" v-on:click="downloadScanCode('scanCode'+t.id,'downloadScanCode'+t.id);"></a>
+									</div>
+								</td>
+								<td>
+									<div class="btn icon icon-edit" v-on:click="showFacility(1,t,'编辑设施')">编辑</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		param.facilityCategoryList = [];
+		loadPage();
+
+		//新建或编辑
+		function showFacility(flag, obj, title) {
+			openMask(obj.id, "../part/facility", title, "650px", "460px", function(layerDom, layerIframe) {
+				layerDom.find("#facilityName").val(obj.facilityName);
+				layerDom.find("#facilityCode").val(obj.facilityCode);
+				layerDom.find("#addressDescription").val(obj.addressDescription);
+				layerDom.find("#facilityCategoryId").val(obj.facilityCategoryId);
+				layerDom.find("#facilityCategoryName").val(obj.facilityCategoryName);
+				layerDom.find("#state").val(obj.state);
+				judeEdit(flag, layerDom);
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选设施吗？", function(param) {
+				request('POST', '/property/facility/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				facilityName: $("#facilityName").val(),
+				facilityCode: $("#facilityCode").val(),
+				facilityCategoryName: $("#facilityCategoryName").val(),
+				state: $("#state").val()
+			};
+			request('POST', '/property/facility/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					if(dataList[i].state == 0) {
+						dataList[i].stateText = "禁用";
+					} else if(dataList[i].state == 1) {
+						dataList[i].stateText = "启用";
+					}
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+				loadFacilityCategory();
+				nextTick(function() {
+					for(var i = 0; i < dataList.length; i++) {
+						makeScanCode(dataList[i], dataList[i].id + "-2");
+					}
+				})
+			}, function() {
+				layer.msg("设施加载失败");
+			})
+		}
+
+		function loadFacilityCategory() {
+			var param = {}
+			request('POST', '/property/facilityCategory/queryList.do', param, true, function(res) {
+				if(res.data.length == 0) {
+					layer.msg("请先新建设施类别", {
+						time: 2000
+					}, function() {
+						tabPage("4-1");
+					});
+				} else {
+					setData.facilityCategoryList = res.data;
+				}
+			}, function() {
+				layer.msg("设施类别加载失败");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

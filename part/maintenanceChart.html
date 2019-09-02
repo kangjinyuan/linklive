@@ -1,0 +1,248 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="chart-box">
+				<div class="chart-list-box chart-list-width-50 chart-list-maintenance">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								报事报修统计
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-maintenance-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-50 chart-list-work-order">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								工单统计
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-work-order-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+		var maintenanceChart = echarts.init($(".chart-maintenance-canvas-box").get(0));
+		var workOrderChart = echarts.init($(".chart-work-order-canvas-box").get(0));
+
+		function resetChartSize() {
+			bindWindowChange(function() {
+				feeChart.resize();
+				doorGuardChart.resize();
+				maintenanceChart.resize();
+				workOrderChart.resize();
+			})
+		}
+
+		function getMaintenance() {
+			var param = {}
+			request('POST', '/statistics/maintenanceReport/record.do', param, true, function(res) {
+				var maintenanceInfo = res.data;
+				maintenanceInfo = [{
+					name: '水',
+					value: maintenanceInfo.waterReportCount,
+				}, {
+					name: '电',
+					value: maintenanceInfo.electricReportCount,
+				}, {
+					name: '燃气',
+					value: maintenanceInfo.gasReportCount,
+				}, {
+					name: '门锁',
+					value: maintenanceInfo.lockReportCount,
+				}, {
+					name: '其他',
+					value: maintenanceInfo.otherReportCount,
+				}];
+				maintenanceChart.setOption({
+					tooltip: {
+						trigger: 'item',
+						formatter: "{a} <br/>{b} : {c} ({d}%)"
+					},
+					legend: {
+						bottom: "0",
+						itemWidth: 10,
+						itemHeight: 10,
+						data: ['水', "电", "燃气", "门锁", "其他"]
+					},
+					series: [{
+						name: '报事报修率',
+						type: 'pie',
+						radius: ["20%", "60%"],
+						center: ['50%', '45%'],
+						roseType: 'radius',
+						label: {
+							normal: {
+								show: true
+							}
+						},
+						labelLine: {
+							normal: {
+								show: true
+							}
+						},
+						data: maintenanceInfo
+					}],
+					color: ['#fd7270', '#9871fb', '#4aed93', '#fec027', '#f581e6']
+				}, true);
+			}, function(res) {
+				layer.msg("报事报修统计加载失败");
+			})
+		}
+
+		function getWorkOrder() {
+			var param = {}
+			request('POST', '/statistics/workOrder/record.do', param, true, function(res) {
+				var workOrderInfo = res.data;
+				reportType = ["保洁类", "绿化类", "秩序类", "工程类", "客服类"];
+				completed = [workOrderInfo.cleanCompleteCount, workOrderInfo.greeningCompleteCount, workOrderInfo.securityCompleteCount, workOrderInfo.engineerCompleteCount, workOrderInfo.customerCompleteCount];
+				inCompleted = [workOrderInfo.cleanIncompleteCount, workOrderInfo.greeningIncompleteCount, workOrderInfo.securityIncompleteCount, workOrderInfo.engineerIncompleteCount, workOrderInfo.customerIncompleteCount]
+				workOrderChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					legend: {
+						bottom: '0',
+						data: ['已完成', '未完成']
+					},
+					grid: {
+						left: "50",
+						right: "10",
+						top: "0"
+					},
+					xAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'category',
+						data: reportType,
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '已完成',
+						type: 'bar',
+						barWidth: 14,
+						stack: '总量',
+						hoverAnimation: true,
+						label: {
+							normal: {
+								show: true,
+								position: 'top',
+								textStyle: {
+									color: "#359df5"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 0, 1, 0, [{
+											offset: 0,
+											color: '#359df5'
+										},
+										{
+											offset: 1,
+											color: '#7bc8ff'
+										}
+									]
+								),
+								barBorderRadius: [7, 0, 0, 7]
+							}
+						},
+						data: completed
+					}, {
+						name: '未完成',
+						type: 'bar',
+						barWidth: 20,
+						stack: '总量',
+						hoverAnimation: true,
+						label: {
+							normal: {
+								show: true,
+								position: 'top',
+								textStyle: {
+									color: "#666"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: '#def1ff',
+								barBorderRadius: [0, 7, 7, 0]
+							}
+						},
+						data: inCompleted
+					}]
+				}, true);
+			}, function(res) {
+				layer.msg("工单统计加载失败");
+			})
+		}
+		getMaintenance();
+		getWorkOrder();
+		resetChartSize();
+	</script>
+
+</html>

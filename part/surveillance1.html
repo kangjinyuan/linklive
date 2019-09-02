@@ -1,0 +1,154 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/hls.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="video-box">
+					<video id="videoUrl" src="" controls="controls" autoplay="autoplay"></video>
+				</div>
+				<input type="hidden" name="" value="" id="offsetX" />
+				<input type="hidden" name="" value="" id="offsetY" />
+				<input type="hidden" name="" value="" id="channel" />
+				<input type="hidden" name="" value="" id="record" />
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">监控名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="name" value="" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">监控编码</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="code" value="" class="required regular-code" placeholder="填写字母和数字" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">设备类别</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="deviceType" class="required">
+							<option value="">==请选择设备类别==</option>
+							<option value="0">普通设备</option>
+							<option value="1">热成像设备</option>
+							<option value="2">位移设备</option>
+							<option value="3">云台设备</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">监控位置</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="location" value="" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">IP地址</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="ipAddress" value="" class="required num" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">用户名</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="loginName" value="" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">密码</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="loginPassword" value="" class="required password" />
+						<div class="mask-list-prompt">4-16位数字或字母，区分大小写</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">音频状态</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="audio">
+							<option value="">==请选择音频状态==</option>
+							<option value="1">启用</option>
+							<option value="0">禁用</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					name: $("#name").val(),
+					code: $("#code").val(),
+					ipAddress: $("#ipAddress").val(),
+					loginName: $("#loginName").val(),
+					loginPassword: $("#loginPassword").val(),
+					location: $("#location").val(),
+					deviceType: $("#deviceType").val(),
+				}
+				request("POST", "/facility/surveillance/saveOrUpdate.do", param, true, function(res) {
+					var Rtsp = "rtsp://" + $("#loginName").val() + ":" + $("#loginPassword").val() + "@" + $("#ipAddress").val() + ":554/Streaming/Channels/101";
+					var param = {
+						Channel: $("#channel").val(),
+						Name: $("#name").val(),
+						Enable: "1",
+						OnDemand: "1",
+						IP: $("#ipAddress").val(),
+						UserName: $("#loginName").val(),
+						Password: $("#loginPassword").val(),
+						Protocol: "RTSP",
+						Rtsp: Rtsp,
+						Record: $("#record").val(),
+						Audio: $("#audio").val(),
+						Transport: "TCP"
+					};
+					easyNvrRequest('GET', '/api/v1/setchannelconfig', param, true, function(res) {
+						parent.layer.close(index);
+						parent.layer.msg("操作成功");
+					}, function(res) {
+						layer.msg('第三方监控设备添加失败，请检查网络或重试');
+					})
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				});
+			}
+		}
+
+		function setVideo() {
+			var video = document.getElementById("video" + dataList[i].id);
+			var hls = new Hls();
+			hls.loadSource(easyNvrUrl + videoUrl);
+			hls.attachMedia(video);
+			hls.on(Hls.Events.MANIFEST_PARSED, function() {
+				video.play();
+			});
+		}
+	</script>
+
+</html>

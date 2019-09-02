@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>评价</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../layui/css/layui.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src='../../js/qiniu/qiniu.min.js'></script>
+		<script src='../../js/qiniu/plupload.full.min.js'></script>
+		<script src="../../js/upload.js?v=3eeca8b25c"></script>
+		<script src="../../js/photoloadinit.js"></script>
+		<script src="../../js/photoload.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="c-box" v-for="t in orderInfo.orderItemList">
+				<div class="setComment-box box-shadow">
+					<div class="comment-text-box">
+						<textarea name="" rows="" cols="" placeholder="收到的宝贝还满意吗？使用效果怎么样？给其他的小伙伴做个参考呗" id="content" oninput="setNum(this);" maxlength="120"></textarea>
+					</div>
+					<div class="word-number">{{wordNumber}}/120</div>
+					<div class="comment-img-box">
+						<div class="img-box" v-for="(t,i) in imageList">
+							<div class="del-img" v-on:click="delImage(i);"></div>
+							<img v-bind:src="t+'?imageView2/1/w/140/h/140'" />
+						</div>
+						<div class="upload-img-box" v-if="imageList.length < 3">
+							<div class="upload-img" id="setComment">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="set-anonymity-box">
+					<div v-bind:class="['set-anonymity',anonymity?'set-anonymityed':'']" v-on:click="setAnonymity();">匿名</div>
+					<div class="set-anonymity-text">您的评价能帮助其他小伙伴呦</div>
+				</div>
+			</div>
+			<div class="big-btn" onclick="setComment();">发布</div>
+		</div>
+	</body>
+	<script>
+		param.anonymity = "";
+		param.imageList = [];
+		param.orderInfo = "";
+		param.wordNumber = 0;
+		loadVue(param);
+
+		//		是否匿名
+		function setAnonymity() {
+			var anonymity = setData.anonymity;
+			if(anonymity == "") {
+				anonymity = 1;
+			} else {
+				anonymity = "";
+			}
+			setData.anonymity = anonymity;
+		}
+
+		function setComment() {
+			var orderInfo = setData.orderInfo;
+			var orderItemId = orderInfo.orderItemList[0].id;
+			var imageList = [];
+			if($("#content").val() == "") {
+				layer.msg("评价内容不能为空");
+				return false;
+			}
+
+			for(var i = 0; i < 3; i++) {
+				if(setData.imageList[i]) {
+					imageList.push(setData.imageList[i].replace(imgUrl, ""))
+				} else {
+					imageList.push("");
+				}
+			}
+
+			var param = {
+				orderId: orderInfo.id,
+				orderItemId: orderItemId,
+				content: $("#content").val(),
+				image0: imageList[0],
+				image1: imageList[1],
+				image2: imageList[2],
+				anonymity: setData.anonymity
+			}
+			request("POST", "/shop/comment/commentOrder.do", param, true, function(res) {
+				window.location.href = "comment_result.html?comment_flag=ok";
+			}, function(res) {
+				window.location.href = "comment_result.html?comment_flag=fail";
+			})
+		}
+
+		function loadData() {
+			var orderInfo = JSON.parse(decodeURIComponent(getQueryString("orderInfo")));
+			setData.orderInfo = orderInfo;
+			nextTick(function() {
+				appUploadImgInit();
+			})
+		}
+		loadData();
+	</script>
+
+</html>

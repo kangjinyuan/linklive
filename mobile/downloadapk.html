@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客社区下载</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/app.css?v=a088f059e3" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/suitphone.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/app.js?v=738ebb1c88"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="full-box">
+				<div class="logo"></div>
+				<div class="version">版本号：{{apkinfo.version}}</div>
+				<div class="big-btn posi-bottom">
+					<a v-bind:href="apkinfo.filePath" download="download">立即下载</a>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.apkinfo = {};
+		loadVue(param);
+
+		function loadapk() {
+			var timestamp = new Date().getTime();
+			var loadding = layer.load(1, {
+				shade: [0.2, '#fafafa'],
+				area: ['37px', '37px']
+			});
+			$.getJSON(downloadUrl + '/apk/update.json?timestamp=' + timestamp, function(res) {
+				setData.apkinfo = res;
+				layer.closeAll('loading');
+			});
+		}
+		loadapk();
+	</script>
+
+</html>

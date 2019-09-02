@@ -1,0 +1,255 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">房屋管理</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">业主姓名：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="ownerName" placeholder="输入业主姓名" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">房屋地址：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="address" placeholder="输入房屋地址" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">房屋类别：</div>
+						<div class="search-value">
+							<select name="" id="type" onchange="sreach();">
+								<option value="">==请选择房屋类别==</option>
+								<option value="0">高层</option>
+								<option value="1">独栋别墅</option>
+								<option value="2">联排别墅</option>
+								<option value="3">洋房</option>
+							</select>
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">产权性质：</div>
+						<div class="search-value">
+							<select name="" id="property" onchange="sreach();">
+								<option value="">==请选择产权性质==</option>
+								<option value="0">个人产权</option>
+								<option value="1">集体产权</option>
+								<option value="2">共有产权</option>
+								<option value="3">物业产权</option>
+							</select>
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">所属楼宇：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="buildingCode" placeholder="输入楼号" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">所属单元：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="unit" placeholder="输入单元号" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">门牌号：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="code" placeholder="输入门牌号" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div v-if="buildingList.length > 0" class="btn icon icon-add" onclick="showRooms(0,'','新建房屋')">新建房屋</div>
+				<div class="btn icon icon-del" onclick="del();">删除</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有房屋哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<tr>
+								<th class="padding20">
+									<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+								<th>业主姓名</th>
+								<th>房屋地址</th>
+								<th>房屋类别</th>
+								<th>产权性质</th>
+								<th>物业费单价（元）</th>
+								<th>物业费截止时间</th>
+								<th>房屋面积（m²）</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<tr v-for="(t,i) in dataList">
+								<td class="padding20">
+									<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.ownerName?t.ownerName:'暂无业主'}}</td>
+								<td>{{t.address}}</td>
+								<td>{{t.type?t.typeText:'暂无房屋类别'}}</td>
+								<td>{{t.property?t.propertyText:'暂无房屋性质'}}</td>
+								<td>{{t.feeValue?t.feeValue:'暂无物业费单价'}}</td>
+								<td v-if="t.renewDeadline">{{t.renewDeadline | resetTime(3)}}</td>
+								<td v-else>暂无物业费截止时间</td>
+								<td>{{t.area}}</td>
+								<td>
+									<div class="btn icon icon-edit" v-on:click="showRooms(1,t,'编辑房屋')">编辑</div>
+									<div class="btn icon icon-bill-collection" v-on:click="showRoomBillCollection(t);">房屋账单</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		param.buildingList = [];
+		loadPage();
+
+		//新建或编辑
+		function showRooms(flag, obj, title) {
+			openMask(obj.id, "../part/rooms", title, "440px", "434px", function(layerDom, layerIframe) {
+				layerIframe[0].contentWindow.loadUnit(obj.unit, function(callback) {
+					layerDom.find("#code").val(obj.code);
+					layerDom.find("#address").val(obj.address);
+					layerDom.find("#property").val(obj.property);
+					layerDom.find("#ownerName").val(obj.ownerName);
+					layerDom.find("#ownerId").val(obj.ownerId);
+					layerDom.find("#type").val(obj.type);
+					layerDom.find("#buildingCode").val(obj.buildingCode);
+					layerDom.find("#buildingId").val(obj.buildingId);
+					layerDom.find("#area").val(obj.area);
+					layerDom.find("#feeId").val(obj.feeId);
+					layerDom.find("#feeValue").val(obj.feeValue);
+					layerDom.find("#renewDeadline").val(resetTime(obj.renewDeadline, 3));
+					judeEdit(flag, layerDom);
+					callback(function() {
+						layerDom.find("#unit").val(obj.unit);
+					});
+				})
+			})
+		}
+
+		//显示房屋账单
+		function showRoomBillCollection(obj) {
+			openMask("", "roomBillCollection", obj.address + "房屋账单", "100%", "100%", function(layerDom, layerIframe) {
+				layerIframe[0].contentWindow.loadData(obj);
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选房屋？", function(param) {
+				request('POST', '/property/rooms/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					if(res.code == "0401") {
+						layer.msg("该房屋钥匙已被业主申请，请勿删除");
+					} else {
+						layer.msg("删除失败，请检查网络或重试");
+					}
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				code: $("#code").val(),
+				unit: $("#unit").val(),
+				buildingCode: $("#buildingCode").val(),
+				address: $("#address").val(),
+				property: $("#property").val(),
+				type: $("#type").val(),
+				ownerName: $("#ownerName").val()
+			};
+			request('POST', '/property/rooms/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					dataList[i].area = parseFloat(dataList[i].area).toFixed(2);
+					dataList[i].fee = parseFloat(dataList[i].fee).toFixed(2);
+					if(dataList[i].property == 0) {
+						dataList[i].propertyText = "个人产权";
+					} else if(dataList[i].property == 1) {
+						dataList[i].propertyText = "集体产权";
+					} else if(dataList[i].property == 2) {
+						dataList[i].propertyText = "共有产权";
+					} else if(dataList[i].property == 3) {
+						dataList[i].propertyText = "物业产权";
+					}
+
+					if(dataList[i].type == 0) {
+						dataList[i].typeText = "高层";
+					} else if(dataList[i].type == 1) {
+						dataList[i].typeText = "独栋别墅";
+					} else if(dataList[i].type == 2) {
+						dataList[i].typeText = "联排别墅";
+					} else if(dataList[i].type == 3) {
+						dataList[i].typeText = "洋房";
+					}
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+				loadBuilding();
+			}, function() {
+				layer.msg("房屋加载失败");
+			})
+		}
+
+		function loadBuilding() {
+			var param = {};
+			request('POST', '/property/buildings/queryList.do', param, true, function(res) {
+				if(res.data.length == 0) {
+					layer.msg("请先新建楼宇", {
+						time: 2000
+					}, function() {
+						tabPage("1-0");
+					});
+				} else {
+					setData.buildingList = res.data;
+				}
+			}, function() {
+				layer.msg("楼宇加载失败");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

@@ -1,0 +1,219 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">人行统计</div>
+			<div class="kjy-opera-box">
+				<div class="opera-main-box">
+					<div class="opera-main-list-box opera-main-left-box">
+						<div class="opera-main-list-inner-box">
+							<div class="full-box" v-if="dataList.length == 0">
+								<div class="no-data-box">
+									<div class="icon icon-no-data"></div>
+									<div class="no-data-text">暂时没有门禁设备哦</div>
+								</div>
+							</div>
+							<ul class="opera-main-nav-box" v-else>
+								<li v-for="t in dataList" v-on:click="tabData(t);">
+									<div v-bind:class="['opera-main-nav-text-box',t.isActive?'selected':'']">{{t.deviceName}}</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="opera-main-list-box opera-main-right-box">
+						<div class="opera-main-list-inner-box">
+							<div class="opera-main-content-box">
+								<div class="full-box">
+									<div class="chart-list-canvas-box"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+
+		var doorGuardChart = echarts.init($(".chart-list-canvas-box").get(0));
+
+		function getDoorMaster() {
+			var param = {
+				pageSize: "10000"
+			}
+			request("POST", "/facility/doorMaster/queryList.do", param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
+				nextTick(function() {
+					if(dataList.length > 0) {
+						tabData(dataList[0]);
+					}
+					getDoorGuard();
+				})
+			}, function(res) {
+				layer.msg("门禁设备加载失败");
+			});
+		}
+
+		function getDoorGuard() {
+			var param = {
+				deviceSn: sInfo.deviceSn
+			}
+			request('POST', '/statistics/doorGuard/record.do', param, true, function(res) {
+				var dataList = res.data;
+				var dateArray = getAppointDate(7, 0);
+				var openingNumber = getIndexArray(dataList, 0, false);
+				var faceOpeningNumber = getIndexArray(dataList, 2, true);
+				var visitors = getIndexArray(dataList, 3, true);
+				doorGuardChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					legend: {
+						bottom: '0',
+						data: ['开门数（次）', '人脸开门数（次）', '访客数（人）']
+					},
+					grid: {
+						left: "30",
+						right: "10",
+						top: "20"
+					},
+					xAxis: [{
+						type: 'category',
+						data: dateArray,
+						axisTick: {
+							alignWithLabel: true
+						},
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '开门数（次）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#359df5',
+								borderWidth: 3,
+								borderColor: "#aeddff"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#359df5',
+								width: 1
+							}
+						},
+						data: openingNumber
+					}, {
+						name: '人脸开门数（次）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#fd7270',
+								borderWidth: 3,
+								borderColor: "#fec8c7"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#fd7270',
+								width: 1
+							}
+						},
+						data: faceOpeningNumber
+					}, {
+						name: '访客数（人）',
+						type: 'line',
+						symbol: "circle",
+						symbolSize: 8,
+						borderWidth: 1,
+						hoverAnimation: true,
+						itemStyle: {
+							normal: {
+								color: '#fcb609',
+								borderWidth: 3,
+								borderColor: "#ffe4a3"
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: '#fcb609',
+								width: 1
+							}
+						},
+						data: visitors
+					}]
+				}, true);
+			}, function(res) {
+				layer.msg("通行统计加载失败");
+			})
+		}
+
+		getDoorMaster();
+	</script>
+
+</html>

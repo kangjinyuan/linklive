@@ -1,0 +1,16 @@
+[{
+	"id" : "0",
+	"title" : "分派工单",
+	"checked" : false,
+	"sort" : "999"
+},{
+	"id" : "1",
+	"title" : "转发工单",
+	"checked" : false,
+	"sort" : "998"
+},{
+	"id" : "2",
+	"title" : "新建考勤组",
+	"checked" : false,
+	"sort" : "997"
+}]

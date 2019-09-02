@@ -1,0 +1,80 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客综合管理平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/photoloadinit.js"></script>
+		<script src="../js/photoload.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask VDOM" v-cloak>
+			<div class="con" v-if="checkTaskInfo.taskType == '2'">
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">结束描述</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" class="layer-edit-box" v-bind:value="checkTaskInfo.checkResultExecution.checkDescription"></textarea>
+					</div>
+				</div>
+				<div class="mask-list" v-if="checkTaskInfo.checkResultExecution.checkImageList.length > 0">
+					<div class="mask-list-name"><span class="text">结果图片：</div>
+					<div class="mask-list-value">
+						<div v-for="image in checkTaskInfo.checkResultExecution.checkImageList" class="img-box">
+							<img v-bind:src="image" alt="" onerror="this.src='../img/no-img.png'" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="con" v-else>
+				<div class="mask-list" v-for="t in checkTaskInfo.standardExecutionList">
+					<div class="kjy-title">{{t.standardName}}({{t.standardCode}})</div>
+					<div class="fold-box">
+						<div class="fold-list-box" v-for="t in t.resultExecutionList">
+							<div class="kjy-title">{{t.pointName}}</div>
+							<div class="con">
+								<div class="mask-list">
+									<div class="mask-list-name"><span class="text">结束描述</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" class="layer-edit-box" v-bind:value="t.checkDescription"></textarea>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">结果图片：</div>
+									<div class="mask-list-value">
+										<div class="img-box" v-for="image in t.checkImageList">
+											<img v-bind:src="image" alt="" onerror="this.src='../img/no-img.png'" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.checkTaskInfo = {};
+		loadVue(param);
+
+		function loadCheckResultExecution(checkTaskInfo) {
+			setData.checkTaskInfo = checkTaskInfo;
+		}
+	</script>
+
+</html>

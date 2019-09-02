@@ -1,0 +1,219 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="chart-box">
+				<div class="chart-list-box chart-list-width-50 chart-list-fee-today">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								今日收费情况
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<ul class="chart-list-content-one-row-box">
+								<li>
+									<div class="chart-list-name">今日收费</div>
+									<div class="chart-list-value">￥{{feeTodayInfo.totalFee}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">收费笔数</div>
+									<div class="chart-list-value">{{feeTodayInfo.totalTransaction}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">线上缴费</div>
+									<div class="chart-list-value">￥{{feeTodayInfo.totalOnlineFee}}</div>
+								</li>
+								<li>
+									<div class="chart-list-name">线上缴费率</div>
+									<div class="chart-list-value">{{feeTodayInfo.onlineFeeRatio}}%</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="chart-list-box chart-list-width-100">
+					<div class="chart-list-inner-box">
+						<div class="chart-list-title-box">
+							<div class="chart-list-title-text">
+								物业经营情况
+							</div>
+							<div class="opera-box">
+								<select name="" id="month" onchange="getFeeInfo();">
+									<option value="1">1月</option>
+									<option value="2">2月</option>
+									<option value="3">3月</option>
+									<option value="4">4月</option>
+									<option value="5">5月</option>
+									<option value="6">6月</option>
+									<option value="7">7月</option>
+									<option value="8">8月</option>
+									<option value="9">9月</option>
+									<option value="10">10月</option>
+									<option value="11">11月</option>
+									<option value="12">12月</option>
+								</select>
+							</div>
+						</div>
+						<div class="chart-list-content-box">
+							<div class="chart-list-canvas-box chart-fee-canvas-box"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.feeTodayInfo = {}
+		loadVue(param);
+		var date = new Date();
+		$("#month").val(date.getMonth() + 1);
+		var feeChart = echarts.init($(".chart-fee-canvas-box").get(0));
+
+		function resetChartSize() {
+			bindWindowChange(function() {
+				feeChart.resize();
+			})
+		}
+
+		function getFeeTodayInfo() {
+			var param = {
+				month: "0"
+			}
+			request('POST', '/statistics/fee/record.do', param, true, function(res) {
+				var feeTodayInfo = res.data;
+				if(feeTodayInfo.totalFee == 0) {
+					var onlineFeeRatio = 0;
+				} else {
+					var onlineFeeRatio = parseFloat(feeTodayInfo.totalOnlineFee) / parseFloat(feeTodayInfo.totalFee);
+				}
+				feeTodayInfo.totalFee = feeTodayInfo.totalFee.toFixed(2);
+				feeTodayInfo.totalOnlineFee = feeTodayInfo.totalOnlineFee.toFixed(2);
+				feeTodayInfo.onlineFeeRatio = onlineFeeRatio.toFixed(2);
+				setData.feeTodayInfo = feeTodayInfo;
+			}, function(res) {
+				layer.msg("今日收费情况加载失败");
+			})
+		}
+
+		function getFeeInfo() {
+			var param = {
+				month: $("#month").val()
+			}
+			request('POST', '/statistics/fee/record.do', param, true, function(res) {
+				var dataList = res.data;
+				var feeName = getTotalFee(dataList).feeName;
+				var totalValue = getTotalFee(dataList).totalValue;
+				feeChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					grid: {
+						left: "50",
+						right: "10",
+						top: "20"
+					},
+					xAxis: [{
+						type: 'category',
+						data: feeName,
+						axisLabel: {
+							interval: 0,
+							rotate: 45,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '收入（元）',
+						type: 'bar',
+						barWidth: 20,
+						label: {
+							normal: {
+								show: true,
+								position: "top",
+								textStyle: {
+									color: "#359df5"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 1, 0, 0, [{
+											offset: 0,
+											color: '#359df5'
+										},
+										{
+											offset: 1,
+											color: '#7bc8ff'
+										}
+									]
+								),
+								barBorderRadius: 10
+							}
+						},
+						data: totalValue
+					}]
+				}, true);
+			}, function() {
+				layer.msg("物业经营情况加载失败");
+			})
+		}
+
+		getFeeTodayInfo();
+		getFeeInfo();
+		resetChartSize();
+	</script>
+
+</html>

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="layui/css/layui.css" />
+		<link rel="stylesheet" href="layui/css/modules/layer/default/layer.css" />
+		<link rel="stylesheet" href="css/main.css?v=e0fae08235" />
+		<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+		<script src="js/vue.min.js"></script>
+		<script src="layui/layui.js"></script>
+		<script src="layui/lay/modules/layer.js"></script>
+		<script src="js/postUrl.js?v=2f85f2877b"></script>
+		<script src="js/common.js?v=e0666996b7"></script>
+		<script type="text/javascript" src="js/rightNav.js?v=6120835142"></script>
+		<script src="js/init.js?v=baf3ad82f3"></script>
+
+	</head>
+
+	<body>
+		<div class="KJY VDOM" v-cloak>
+			<div class="header">
+				<div class="header-txt title f_l">邻客社区平台</div>
+				<div class="header-txt txt-udline icon icon-menu f_l hide-box" onclick="showMenu();">功能菜单</div>
+				<div class="header-txt txt-udline icon icon-left f_l" onclick="menuSwitch(this);">收起菜单</div>
+				<div class="header-txt txt-udline icon icon-time f_l"></div>
+				<div class="header-txt txt-udline icon icon-quit f_r" onclick="quit();">退出登录</div>
+				<div class="header-txt txt-udline icon icon-user f_r">{{username}}</div>
+				<div class="header-txt txt-udline f_r" onclick="changeCommunity();">当前小区：{{communityName}}</div>
+			</div>
+			<div class="main">
+				<div class="mainLeft f_l">
+					<ul class="layui-nav layui-nav-tree" lay-filter="test">
+						<li v-bind:class="['layui-nav-item',pt.show ? 'layui-nav-itemed' : '']" v-for="pt in dataList" v-if="pt.checked == true">
+							<a class="" href="javascript:;">{{pt.title}}</a>
+							<dl class="layui-nav-child">
+								<dd v-for="t in pt.csub" v-if="t.checked == true">
+									<a v-bind:class="t.icon" v-bind:data-page="t.page" v-bind:id="t.id">{{t.title}}</a>
+								</dd>
+							</dl>
+						</li>
+					</ul>
+				</div>
+				<div class="mainRight f_r">
+					<ul class="top-nav-box">
+						<li v-for="(t,i) in serviceList" v-bind:class="serviceIndex == i?'selected':''" v-if="t.csub.length > 0" v-on:click="tabService(i);">{{t.title}}</li>
+					</ul>
+					<div class="rightCon">
+						<div class="layui-tab" lay-filter="KJY" lay-allowclose="true">
+							<ul class="layui-tab-title top_tab" id="rightNav">
+								<li class="layui-this" lay-id="">首页</li>
+							</ul>
+							<div class="layui-tab-content" id="rightIframe">
+								<div class="layui-tab-item layui-show">
+									<iframe v-bind:src="'index.html?timestamp='+timestamp" frameborder='0' marginheight='0' marginwidth='0' scrolling='yes' width='100%'></iframe>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="rightFooter">copyright &copy; 北京闪向科技有限公司</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,97 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">类别名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="categoryName" value="" class="required big len30" />
+						<div class="mask-list-prompt">类别名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">类别编码</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="categoryCode" value="" class="required regular-code" placeholder="填写字母和数字" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">所属部门</span>：</div>
+					<div class="mask-list-value mask-list200">
+						<input type="text" name="" value="" id="department" disabled="disabled" class="required" />
+						<input type="hidden" name="" value="" id="departmentId" class="required" />
+					</div>
+					<div class="btn icon icon-select" onclick="selectDepartment();">选择部门</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">备注</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" id="remark" class="layer-edit-box"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		function selectDepartment() {
+			openMask('', "selectDepartment", "选择部门", "98%", "98%", function(layerDom, layerIframe) {
+				var parentData = {
+					departmentName: "department",
+					departmentId: "departmentId"
+				}
+				layerIframe[0].contentWindow.loadData(parentData);
+			})
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					categoryName: $("#categoryName").val(),
+					categoryCode: $("#categoryCode").val(),
+					departmentId: $("#departmentId").val(),
+					department: $("#department").val(),
+					remark: $("#remark").val()
+				};
+				request('POST', '/property/checkCategory/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					if(res.code == "0004") {
+						layer.msg("该类别已存在，请勿重复操作");
+					} else {
+						layer.msg('操作失败，请检查网络或重试');
+					}
+				})
+			}
+		}
+	</script>
+
+</html>

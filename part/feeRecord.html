@@ -1,0 +1,116 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">支付人姓名</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="payer" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">支付人手机号</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="payerTelephone" class="phone" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">房屋地址</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="payerAddress" class="required room-address" />
+						<div class="mask-list-prompt">房屋地址格式：楼号-单元号-门牌号</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">操作员</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="operator" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">缴费项目</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="feeName" disabled="disabled" class="required" />
+						<input type="hidden" name="" value="" id="feeId" class="required" />
+					</div>
+					<div class="btn icon icon-select" onclick="selectFee();">选择缴费项目</div>
+				</div>
+				<div class="mask-list c_b">
+					<div class="mask-list-name"><span>*</span><span class="text">缴费金额</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="fee" placeholder="填写数字" class="num-box num required" />
+						<div class="unit96">元</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">备注</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" id="detail" class="layer-edit-box"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		function selectFee() {
+			openMask('', "selectFee", "选择缴费项目", "98%", "98%", function(layerDom, layerIframe) {
+				var parentData = {
+					flag: 0,
+					feeName: "feeName",
+					feeId: "feeId"
+				}
+				layerIframe[0].contentWindow.loadData(parentData);
+			})
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					feeId: $("#feeId").val(),
+					feeName: $("#feeName").val(),
+					payerAddress: $("#payerAddress").val(),
+					payer: $("#payer").val(),
+					payerTelephone: $("#payerTelephone").val(),
+					fee: $("#fee").val(),
+					operator: $("#operator").val(),
+					detail: $("#detail").val(),
+				};
+				request('POST', '/property/feeRecord/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				})
+			}
+		}
+	</script>
+
+</html>

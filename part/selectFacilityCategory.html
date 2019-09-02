@@ -1,0 +1,95 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask VDOM" v-cloak>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">类别名称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="name" placeholder="输入类别名称" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有设施类别哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<th class="padding20">序号</th>
+							<th>类别名称</th>
+							<th>创建时间</th>
+						</thead>
+						<tbody>
+							<tr v-for="(t,i) in dataList" v-on:click="tabData(t)">
+								<td class="padding20">
+									<div v-bind:class="['radio-no-check',t.isActive?'radio-checked':'']"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.name}}</td>
+								<td>{{t.createTime}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadSmallPage();
+
+		//确定上一级页面参数
+		function setParentData() {
+			var parentData = setData.parentData;
+			$("#" + parentData.facilityCategoryName, window.parent.document).val(sInfo.name);
+			$("#" + parentData.facilityCategoryId, window.parent.document).val(sInfo.id);
+		}
+
+		//		加载数据
+		function loadData(parentData) {
+			var param = {
+				page: page,
+				name: $("#name").val()
+			};
+			request('POST', '/property/facilityCategory/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
+				setData.parentData = parentData;
+			}, function() {
+				layer.msg("设施类别加载失败");
+			})
+		}
+	</script>
+
+</html>

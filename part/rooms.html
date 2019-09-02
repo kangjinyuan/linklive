@@ -1,0 +1,198 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">房屋类别</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="type">
+							<option value="">==请选择房屋类别==</option>
+							<option value="0">高层</option>
+							<option value="1">独栋别墅</option>
+							<option value="2">联排别墅</option>
+							<option value="3">洋房</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">产权性质</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="property">
+							<option value="">==请选择产权性质==</option>
+							<option value="0">个人产权</option>
+							<option value="1">集体产权</option>
+							<option value="2">共有产权</option>
+							<option value="3">物业产权</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">业主姓名</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="ownerName" disabled="disabled" />
+						<input type="hidden" name="" value="" id="ownerId" />
+						<div class="mask-list-prompt">更换业主，原业主房屋权限将被清除</div>
+					</div>
+					<div class="btn icon icon-select" onclick="selectParam(0);">选择业主</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">门牌号</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="code" value="" placeholder="填写数字" class="required regular-code num-box" />
+						<div class="mask-list-prompt">门牌号格式： 101 地下室格式：D101</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">物业费单价</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="feeValue" disabled="disabled" class="num num-box required" />
+						<input type="hidden" name="" value="" id="feeId" class="required" />
+						<div class="unit96">元</div>
+					</div>
+					<div class="btn icon icon-select" onclick="selectParam(2);">选择物业费</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">截止时间</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="renewDeadline" placeholder="填写物业费截止时间" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">房屋面积</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="area" placeholder="填写数字" class="required num num-box" />
+						<div class="unit96">㎡</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">所属楼宇</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="buildingCode" disabled="disabled" class="num-box required" />
+						<input type="hidden" name="" value="" id="buildingId" class="required" />
+						<div class="unit96">号</div>
+					</div>
+					<div class="btn icon icon-select" onclick="selectParam(1);">选择楼宇</div>
+				</div>
+				<div class="mask-list hide-box" id="unitbox">
+					<div class="mask-list-name"><span>*</span><span class="text">所属单元</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="unit" class="required">
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			setTime('#renewDeadline', "date");
+		})
+
+		function selectParam(flag) {
+			if(flag == 0) {
+				openMask('', "selectProprietor", "选择业主", "98%", "98%", function(layerDom, layerIframe) {
+					var parentData = {
+						ownerName: "ownerName",
+						ownerId: "ownerId"
+					}
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			} else if(flag == 1) {
+				var parentData = {
+					buildingCode: "buildingCode",
+					buildingId: "buildingId"
+				}
+				openMask('', "selectBuilding", "选择楼宇", "98%", "98%", function(layerDom, layerIframe) {
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			} else if(flag == 2) {
+				var parentData = {
+					flag: 1,
+					feeValue: "feeValue",
+					feeId: "feeId"
+				}
+				openMask('', "selectFee", "选择物业费", "98%", "98%", function(layerDom, layerIframe) {
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			}
+		}
+
+		function loadUnit(units, callback) {
+			callback(function(callback) {
+				if(units) {
+					$("#unit").empty();
+					$("#unit").append("<option value=''>==请选择所属单元==</option>")
+					for(var i = 0; i < units; i++) {
+						$("#unit").append("<option value='" + (i + 1) + "'>" + (i + 1) + "单元</option>");
+					}
+					$("#unitbox").show();
+					callback();
+				}
+			});
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				if(parseFloat($("#area").val()) == 0) {
+					layer.msg("房屋面积不能为0");
+					return false;
+				}
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					code: $("#code").val(),
+					ownerId: $("#ownerId").val(),
+					ownerName: $("#ownerName").val(),
+					address: $("#buildingCode").val() + "-" + $("#unit").val() + "-" + $("#code").val(),
+					property: $("#property").val(),
+					type: $("#type").val(),
+					buildingId: $("#buildingId").val(),
+					buildingCode: $("#buildingCode").val(),
+					unit: $("#unit").val(),
+					area: $("#area").val(),
+					feeId: $("#feeId").val(),
+					feeValue: $("#feeValue").val(),
+					renewDeadline: resetTime($("#renewDeadline").val(), 0)
+				};
+				request('POST', '/property/rooms/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					if(res.code == "0004") {
+						layer.msg("该房屋已存在，请勿重复操作");
+					} else {
+						layer.msg('操作失败，请检查网络或重试');
+					}
+				})
+			}
+		}
+	</script>
+
+</html>

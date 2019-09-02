@@ -1,0 +1,156 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/editInit.js?v=ee98052d29"></script>
+		<script src='../js/qiniu/qiniu.min.js'></script>
+		<script src='../js/qiniu/plupload.full.min.js'></script>
+		<script src="../js/upload.js?v=fe0a473fcd"></script>
+		<script src="../js/photoload.js"></script>
+		<script src="../js/photoloadinit.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动封面</span>：</div>
+					<div class="mask-list-value">
+						<div class="img-box">
+							<img data-width="2" data-height="1" src="" alt="" onerror="this.src='../img/no-img.png'" class="required-img" />
+							<div class="btn icon icon-upload-img upload-img" id="imageUrl">上传图片</div>
+						</div>
+						<div class="mask-list-prompt">支持pjpeg、jpeg、bmp、jpg、png格式,图片大小不能超过2M，图片宽高比为2:1。</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="name" value="" class="required len30 big" />
+						<div class="mask-list-prompt">活动名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动开始</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="beginTime" value="" class="required" placeholder="填写活动开始时间" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动结束</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="endTime" value="" class="required" placeholder="填写活动结束时间" />
+					</div>
+				</div>
+				<div class="mask-list c_b">
+					<div class="mask-list-name"><span>*</span><span class="text">报名截止</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="deadLineTime" value="" class="required" placeholder="填写报名截止时间" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动人数</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="availablePeople" value="" class="required num num-box" placeholder="填写数字" />
+						<div class="unit96">人</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动地点</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="address" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">活动费用</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="activityFee" placeholder="填写数字" class="num num-box" />
+						<div class="unit96">元</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">联系人</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="charger" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">联系电话</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="chargerTelephone" class="required phone" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">活动内容</span>：</div>
+					<div class="mask-list-value layer-edit-box">
+						<textarea id="detail" name="" rows="" cols=""></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			setTime('#beginTime', "datetime");
+			setTime('#endTime', "datetime");
+			setTime('#deadLineTime', "datetime");
+		})
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				if($(".layui-layedit iframe").contents().find("body").html() == "") {
+					layer.msg("活动内容 为必填项 请核对");
+					return false;
+				}
+				if($(".layui-layedit iframe").contents().find("body").html().length >= 500) {
+					layer.msg("活动内容过多，请删减活动内容");
+					return false;
+				}
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					imageUrl: $("#imageUrl").siblings("img").attr("src").split("?")[0].replace(imgUrl, ""),
+					name: $("#name").val(),
+					beginTime: $("#beginTime").val(),
+					endTime: $("#endTime").val(),
+					availablePeople: $("#availablePeople").val(),
+					deadLineTime: $("#deadLineTime").val(),
+					address: $("#address").val(),
+					activityFee: $("#activityFee").val(),
+					charger: $("#charger").val(),
+					chargerTelephone: $("#chargerTelephone").val(),
+					detail: $(".layui-layedit iframe").contents().find("body").html(),
+				};
+				request('POST', '/shop/activity/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				})
+			}
+		}
+	</script>
+
+</html>

@@ -1,0 +1,307 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom VDOM" v-cloak>
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">任务名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="name" value="" class="required len30 big" />
+						<div class="mask-list-prompt">任务名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">任务描述</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="taskDescription" value="" class="len200 big" />
+						<div class="mask-list-prompt">任务描述不超过200个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">巡更方式</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="patrolMode" class="required" onchange="selectPatrolMode();">
+							<option value="">==请选择巡更方式==</option>
+							<option value="0">定位巡更</option>
+							<option value="1">NFC巡更</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">是否按序</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="patrolByOrder" class="required">
+							<option value="">==请选择是否按序==</option>
+							<option value="1">是</option>
+							<option value="0">否</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">巡更点位</span>：</div>
+					<div class="mask-list-value">
+						<div class="no-range-box" v-if="dataList.length == 0">暂无巡更点位</div>
+						<ul v-else class="range-box">
+							<li v-for="(t,i) in dataList">
+								{{t.name}}
+								<div class="del-range" v-on:click="delRange(i);"></div>
+							</li>
+						</ul>
+						<div class="btn icon icon-select" onclick="selectPart(0);">选择巡更点位</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">负责人姓名</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="stuffName" disabled="disabled" class="required" />
+						<input type="hidden" name="" value="" id="stuffId" />
+					</div>
+					<div class="btn icon icon-select select-stuff-btn" onclick="selectPart(1);">选择负责人</div>
+				</div>
+				<div class="mask-list c_b">
+					<div class="mask-list-name"><span>*</span><span class="text">开始时间</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="scheduledTime" value="" class="required" placeholder="填写开始时间" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">持续天数</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="lastingDays" value="" class="required num num-box" placeholder="填写数字" />
+						<div class="unit96">天</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">周期类别</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="taskMode" class="required" onchange="selectTaskMode(this);">
+							<option value="">==请选择周期类别==</option>
+							<option value="0">天</option>
+							<option value="1">周</option>
+							<option value="2">月</option>
+							<option value="3">季</option>
+							<option value="4">年</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list hide-box week-box">
+					<div class="mask-list-name"><span>*</span><span class="text">每周开始日期</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="weekValue">
+							<option value="">==请选择本周开始日期==</option>
+							<option value="1">周一</option>
+							<option value="2">周二</option>
+							<option value="3">周三</option>
+							<option value="4">周四</option>
+							<option value="5">周五</option>
+							<option value="6">周六</option>
+							<option value="0">周日</option>
+						</select>
+					</div>
+				</div>
+				<div class="mask-list hide-box month-box">
+					<div class="mask-list-name"><span>*</span><span class="text">每月几号</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="monthValue" class="num-box num" />
+						<div class="unit96">号</div>
+					</div>
+				</div>
+				<div class="mask-list hide-box quarter-box">
+					<div class="mask-list-name"><span>*</span><span class="text">每季第几天</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="quarterValue" class="num-box num" />
+						<div class="unit96">天</div>
+					</div>
+				</div>
+				<div class="mask-list hide-box year-box">
+					<div class="mask-list-name"><span>*</span><span class="text">每年开始日期</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="yearStartTime" placeholder="填写每年开始日期" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">计划状态</span>：</div>
+					<div class="mask-list-value">
+						<select name="" id="state" class="required">
+							<option value="">==请选择计划状态==</option>
+							<option value="1">启用</option>
+							<option value="0">禁用</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			setTime('#scheduledTime', "time");
+			setTime('#yearStartTime', "date");
+		})
+
+		loadVue(param)
+
+		function selectPatrolMode() {
+			setData.dataList = []
+		}
+
+		function selectTaskMode(t) {
+			$("#weekValue").val("");
+			$("#monthValue").val("");
+			$("#quarterValue").val("");
+			$("#yearStartTime").val("");
+			if($(t).val() == 1) {
+				$(".week-box").show();
+				$("#weekValue").addClass("required");
+				$(".month-box").hide();
+				$("#monthValue").removeClass("required");
+				$(".quarter-box").hide();
+				$("#quarterValue").removeClass("required");
+				$(".year-box").hide();
+				$("#yearStartTime").removeClass("required");
+			} else if($(t).val() == 2) {
+				$(".week-box").hide();
+				$("#weekValue").removeClass("required");
+				$(".month-box").show();
+				$("#monthValue").addClass("required");
+				$(".quarter-box").hide();
+				$("#quarterValue").removeClass("required");
+				$(".year-box").hide();
+				$("#yearStartTime").removeClass("required");
+			} else if($(t).val() == 3) {
+				$(".week-box").hide();
+				$("#weekValue").removeClass("required");
+				$(".month-box").hide();
+				$("#monthValue").removeClass("required");
+				$(".quarter-box").show();
+				$("#quarterValue").addClass("required");
+				$(".year-box").hide();
+				$("#yearStartTime").removeClass("required");
+			} else if($(t).val() == 4) {
+				$(".week-box").hide();
+				$("#weekValue").removeClass("required");
+				$(".month-box").hide();
+				$("#monthValue").removeClass("required");
+				$(".quarter-box").hide();
+				$("#quarterValue").removeClass("required");
+				$(".year-box").show();
+				$("#yearStartTime").addClass("required");
+			} else {
+				$(".week-box").hide();
+				$("#weekValue").removeClass("required");
+				$(".month-box").hide();
+				$("#monthValue").removeClass("required");
+				$(".quarter-box").hide();
+				$("#quarterValue").removeClass("required");
+				$(".year-box").hide();
+				$("#yearStartTime").removeClass("required");
+			}
+		}
+
+		function selectPart(flag) {
+			if(flag == 0) {
+				if($("#patrolMode").val() == "") {
+					layer.msg("请选择巡更方式");
+					return false;
+				}
+				openMask('', "selectLocationPointRange", "选择巡更点位", "98%", "98%", function(layerDom, layerIframe) {
+					var parentData = {
+						patrolMode: $("#patrolMode").val(),
+						dataList: setData.dataList
+					}
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			} else if(flag == 1) {
+				openMask('', "selectStuff", "选择负责人", "98%", "98%", function(layerDom, layerIframe) {
+					var parentData = {
+						stuffName: "stuffName",
+						stuffId: "stuffId"
+					}
+					layerIframe[0].contentWindow.loadData(parentData);
+				})
+			}
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var triggerTime = "";
+				var locationPointJson = setData.dataList;
+				if(locationPointJson.length == 0) {
+					layer.msg("请选择巡更点位");
+					return false;
+				}
+				if(locationPointJson.length > 10) {
+					layer.msg("巡更点位不能超过10个");
+					return false;
+				}
+				if($("#taskMode").val() == 0) {
+					triggerTime = "";
+				} else if($("#taskMode").val() == 1) {
+					triggerTime = $("#weekValue").val();
+				} else if($("#taskMode").val() == 2) {
+					triggerTime = $("#monthValue").val();
+				} else if($("#taskMode").val() == 3) {
+					triggerTime = $("#quarterValue").val();
+				} else {
+					triggerTime = $("#yearStartTime").val();
+				}
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					name: $("#name").val(),
+					taskDescription: $("#taskDescription").val(),
+					patrolMode: $("#patrolMode").val(),
+					patrolByOrder: $("#patrolByOrder").val(),
+					locationPointJson: JSON.stringify(locationPointJson),
+					staffId: $("#stuffId").val(),
+					staffName: $("#stuffName").val(),
+					scheduledTime: $("#scheduledTime").val(),
+					taskMode: $("#taskMode").val(),
+					triggerTime: triggerTime,
+					lastingDays: $("#lastingDays").val(),
+					state: $("#state").val()
+				};
+				request('POST', '/property/patrolTaskSchedule/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				})
+			}
+		}
+
+		function loadLocationPointJson(locationPointJson, callback) {
+			setData.dataList = locationPointJson;
+			nextTick(function() {
+				callback();
+			})
+		}
+	</script>
+
+</html>

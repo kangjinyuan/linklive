@@ -1,0 +1,124 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../layui/css/modules/layer/default/layer.css" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.js"></script>
+		<script src="../layui/lay/modules/layer.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM main-mask" v-cloak>
+			<form class="layui-form" action="" lay-filter="qxform">
+				<div class="layui-collapse" lay-accordion="" v-for="t in dataList" v-if="t.csub.length > 0">
+					<div class="layui-colla-item">
+						<h2 class="layui-colla-title">{{t.title}}</h2>
+						<div class="layui-colla-content layui-show">
+							<div class="layui-collapse" lay-accordion="" v-for="t in t.csub">
+								<div class="layui-colla-item">
+									<h2 class="layui-colla-title">{{t.title}}</h2>
+									<div class="layui-colla-content layui-show">
+										<ul class="privillege-list-box">
+											<li v-for="t in t.csub">
+												{{t.title}}
+												<input v-if="t.checked == true" type="checkbox" checked="" v-bind:value="t.id" name="qxtype" lay-skin="switch" lay-filter="qxswitch" lay-text="ON|OFF">
+												<input v-else type="checkbox" name="qxtype" lay-skin="switch" v-bind:value="t.id" lay-filter="qxswitch" lay-text="ON|OFF">
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script>
+		param.account = "";
+		param.privillege = [];
+		loadVue(param);
+
+		function setlayui() {
+			layui.use(['element', 'layer', 'form', 'layedit', 'laydate'], function() {
+				var element = layui.element,
+					form = layui.form;
+				//监听指定开关
+				form.on('switch(qxswitch)', function(data) {
+					var tid = data.value;
+					var tchecked = this.checked;
+					var privillege = setData.privilege;
+					for(var i = 0; i < privillege.length; i++) {
+						var csub = privillege[i].csub;
+						for(var j = 0; j < csub.length; j++) {
+							if(tid == csub[j].id) {
+								csub[j].checked = tchecked;
+							}
+						}
+					}
+					for(var i = 0; i < privillege.length; i++) {
+						var csub = privillege[i].csub;
+						for(var j = 0; j < csub.length; j++) {
+							if(csub[j].checked == true) {
+								privillege[i].checked = true;
+								break;
+							} else {
+								privillege[i].checked = false;
+							}
+						}
+					}
+					var param = {
+						id: $(".main-mask").attr("data-id"),
+						account: setData.account,
+						privillege: JSON.stringify(privillege),
+						pmcId: accountInfo.pmcId
+					};
+					request('POST', '/account/administrator/saveOrUpdate.do', param, true, function(res) {
+						layer.msg('操作成功');
+					}, function(res) {
+						layer.msg('操作失败，请检查网络或重试');
+					})
+				});
+			});
+		}
+
+		//		加载数据
+		function loadData(privillege, account) {
+			var timestamp = new Date().getTime();
+			setData.account = account;
+			privillege = JSON.parse(privillege);
+			setData.privillege = privillege;
+			getService(function(res) {
+				var dataList = res;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].csub = [];
+					for(var j = 0; j < privillege.length; j++) {
+						if(dataList[i].id == privillege[j].serviceType) {
+							dataList[i].csub.push(privillege[j]);
+						}
+					}
+				}
+				setData.dataList = dataList;
+			})
+			nextTick(setlayui);
+			layer.msg("权限加载成功");
+		}
+	</script>
+
+</html>

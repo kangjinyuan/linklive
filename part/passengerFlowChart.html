@@ -1,0 +1,150 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">客流量统计</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+			</div>
+			<div class="kjy-opera-box">
+				<div class="opera-main-box">
+					<div class="opera-main-list-box opera-main-left-box">
+						<div class="opera-main-list-inner-box">
+							<ul class="opera-main-nav-box opera-main-video-nav-box">
+								<li class="icon-video333">
+									<div class="opera-main-nav-text-box">监控1号点位</div>
+								</li>
+								<li class="icon-video333">
+									<div class="opera-main-nav-text-box">监控2号点位</div>
+								</li>
+								<li class="icon-video333">
+									<div class="opera-main-nav-text-box">监控3号点位</div>
+								</li>
+								<li class="icon-video333">
+									<div class="opera-main-nav-text-box">监控4号点位</div>
+								</li>
+								<li class="icon-video333">
+									<div class="opera-main-nav-text-box">监控5号点位</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="opera-main-list-box opera-main-right-box">
+						<div class="opera-main-list-inner-box">
+							<div class="opera-main-content-box">
+								<div class="full-box">
+									<div class="chart-list-canvas-box" id="tj"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+		var tj_chart = echarts.init($("#tj").get(0));
+
+		function loadData() {
+			var param = {}
+			request('POST', '/property/department/queryList.do', param, true, function(res) {
+				var name = ["00-01", "01-02", "02-03", "03-04", "04-05", "05-06", "06-07", "07-08", "08-09", "09-10", "10-11", "11-12", "12-13", "13-14", "14-15", "15-16", "16-17", "17-18", "18-19", "19-20", "21-22", "22-23", "23-24"];
+				var tjvalue = ["2200", "3010", "5000", "6200", "5600", "7100", "5170", "9100", "10000", "5000", "1200", "800", "2200", "3010", "5000", "6200", "5600", "7100", "5170", "9100", "10000", "5000", "1200"];
+				tj_chart.setOption({
+					color: ['#1f487c'],
+					title: {
+						text: '客流量统计表',
+						left: 'center'
+					},
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'shadow'
+						}
+					},
+					grid: {
+						x: 40,
+						containLabel: true
+					},
+					xAxis: [{
+						name: '时间',
+						type: 'category',
+						data: name,
+						axisTick: {
+							alignWithLabel: true
+						},
+						axisLabel: {
+							interval: 0,
+							rotate: 45,
+							textStyle: {
+								color: "#666",
+							}
+						},
+					}],
+					yAxis: [{
+						name: '人数（人）',
+						type: 'value',
+					}],
+					series: [{
+						name: '人数（人）',
+						type: 'line',
+						symbolSize: 15,
+						borderWidth: 5,
+						label: {
+							normal: {
+								show: true,
+								position: 'top'
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: 'rgba(193,0,0,0.8)'
+							}
+						},
+						lineStyle: {
+							normal: {
+								color: 'rgba(193,0,0,0.8)',
+								width: 3,
+								shadowColor: 'rgba(0,0,0,0.75)'
+							}
+						},
+						data: tjvalue
+					}]
+				}, true);
+			}, function() {
+				layer.msg("客流量统计加载失败");
+			})
+		}
+
+		function resetChartSize() {
+			bindWindowChange(function() {
+				tj_chart.resize();
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

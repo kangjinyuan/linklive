@@ -1,0 +1,125 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.ToolBar"></script>
+		<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom">
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">点位名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="name" value="" class="required big len30" />
+						<div class="mask-list-prompt">点位名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">点位地址</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="address" disabled="disabled" value="" class="required big" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">经度</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="longitude" value="" disabled="disabled" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">纬度</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="latitude" value="" disabled="disabled" class="required" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">NFC编码</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="nfcTag" value="" />
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span class="text">备注</span>：</div>
+					<div class="mask-list-value">
+						<textarea name="" rows="" cols="" id="remark" class="layer-edit-box"></textarea>
+					</div>
+				</div>
+				<div class="kjy-data-box" id="mapBox"></div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var param = {
+					id: $(".main-mask").attr("data-id"),
+					name: $("#name").val(),
+					address: $("#address").val(),
+					longitude: $("#longitude").val(),
+					latitude: $("#latitude").val(),
+					nfcTag: $("#nfcTag").val(),
+					remark: $("#remark").val()
+				};
+				request('POST', '/property/locationPoint/saveOrUpdate.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					layer.msg('操作失败，请检查网络或重试');
+				})
+			}
+		}
+
+		function setMap(parentData, callback) {
+			AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
+				var map = new AMap.Map('mapBox', {
+					zoom: 18,
+					center: [parentData.longitude, parentData.latitude]
+				})
+				var positionPicker = new PositionPicker({
+					mode: 'dragMarker',
+					map: map
+				});
+				positionPicker.on('success', function(positionResult) {
+					if(positionResult.info == "OK") {
+						$("#address").val(positionResult.address);
+						$("#latitude").val(positionResult.position.lat);
+						$("#longitude").val(positionResult.position.lng);
+					}
+				});
+				positionPicker.on('fail', function(positionResult) {
+					layer.msg("定位失败");
+				});
+				positionPicker.start();
+				map.addControl(new AMap.ToolBar({
+					liteStyle: true
+				}))
+				callback();
+			});
+		}
+	</script>
+
+</html>

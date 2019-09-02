@@ -1,0 +1,108 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="KJY_title">业主反馈</div>
+			<div class="searchbox">
+				<div class="search_text">
+					<div class="search">
+						<div class="searchname">反馈内容：</div>
+						<div class="searchvalue">
+							<input type="text" name="" value="" id="content" placeholder="输入反馈内容" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btnbox">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<!--<div class="btn icon icon-del" onclick="del();">删除</div>-->
+				<!--<div class="btn icon icon-feedback" onclick="showmask();">意见反馈</div>-->
+			</div>
+			<div class="KJY_table">
+				<table>
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>反馈者昵称</th>
+							<th>反馈内容</th>
+							<th>创建时间</th>
+						</tr>
+					</thead>
+
+					<tbody id="tbody">
+						<tr v-for="(t,i) in dataList">
+							<td>{{((currentPage-1)*20)+(i+1)}}</td>
+							<td>{{t.accountName}}</td>
+							<td>{{t.content}}</td>
+							<td>{{t.createTime}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadPage();
+
+		//新建或编辑
+		function showmask() {
+			openMask("", "../part/feedback", "意见反馈", "390px", "240px", function(layerDom, layerIframe) {
+				judeaddorsee(0, layerDom);
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选意见反馈吗？", function(param) {
+				request('POST', '/property/feedback/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				content: $("#content").val()
+			};
+			request('POST', '/property/feedback/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+			}, function(res) {
+				layer.msg("业主反馈加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

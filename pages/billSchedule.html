@@ -1,0 +1,185 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="kjy-title">账单计划管理</div>
+			<div class="search-box">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">账单名称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="title" placeholder="输入账单名称" />
+						</div>
+					</div>
+					<div class="search">
+						<div class="search-name">缴费项目：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="feeName" placeholder="输入缴费项目" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div v-if="feeList.length > 0" class="btn icon icon-add" onclick="showBillSchedule(0,'','新建账单计划')">新建账单计划</div>
+				<div class="btn icon icon-del" onclick="del();">删除</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有账单计划哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<tr>
+								<th class="padding20">
+									<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+								<th>账单名称</th>
+								<th>缴费项目</th>
+								<th>账单周期性</th>
+								<th>创建时间</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<tr v-for="(t,i) in dataList">
+								<td class="padding20">
+									<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.title}}</td>
+								<td>{{t.feeName}}</td>
+								<td>
+									<ul class="dateList">
+										<li v-for="dlist in t.dateList">{{dlist | resetTime(3)}}</li>
+									</ul>
+								</td>
+								<td>{{t.createTime}}</td>
+								<td>
+									<div class="btn icon icon-see" v-on:click="showBillSchedule(2,t,'查看账单计划')">查看</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		param.feeList = [];
+		loadPage();
+
+		//新建或编辑
+		function showBillSchedule(flag, obj, title) {
+			openMask(obj.id, "../part/billSchedule", title, "630px", "460px", function(layerDom, layerIframe) {
+				layerIframe[0].contentWindow.loadBuildings(obj.buildingList, function() {
+					layerDom.find("#title").val(obj.title);
+					layerDom.find("#feeId").val(obj.feeId);
+					layerDom.find("#feeName").val(obj.feeName);
+					if(obj.dateList) {
+						var dateList = obj.dateList;
+						layerDom.find("#jzcs").val(dateList.length);
+						if(dateList.length == 12) {
+							layerDom.find(".jzday").show().val(dateList[0].split(" ")[0].split("-")[2]).addClass("required");
+							layerDom.find(".masklist_prompt").show();
+						} else {
+							for(var i = 0; i < dateList.length; i++) {
+								layerDom.find(".jztime" + i).show().val(resetTime(dateList[i], 3)).addClass("required");
+							}
+							layerDom.find(".jzday").hide().removeClass("required");
+							layerDom.find(".masklist_prompt").hide();
+						}
+					}
+					judeEdit(flag, layerDom);
+				})
+
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选账单计划？", function(param) {
+				request('POST', '/property/billSchedule/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				title: $("#title").val(),
+				feeName: $("#feeName").val()
+			};
+			request('POST', '/property/billSchedule/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+				loadFee();
+			}, function() {
+				layer.msg("账单计划加载失败");
+			})
+		}
+
+		function loadFee() {
+			var param = {
+				pageSize: "10000",
+				feeProperty: "0",
+				calculateType: "0",
+			}
+			request('POST', '/property/fee/queryList.do', param, true, function(res) {
+				var feeList = res.data;
+				for(var i = 0; i < feeList.length; i++) {
+					var feeName = feeList[i].feeName;
+					if(feeName.indexOf("固定停车费") > -1) {
+						feeList.splice(i--, 1);
+					}
+				}
+				if(feeList.length == 0) {
+					layer.msg("请先新建计划类别缴费项目", {
+						time: 2000
+					}, function() {
+						tabPage('3-0');
+					});
+				} else {
+					setData.feeList = feeList;
+				}
+			}, function() {
+				layer.msg("缴费项目加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>活动详情</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=ec9c995659" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=6f84fa779a"></script>
+		<script src="../../js/app.js?v=94ec3996b1"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="activity-box">
+				<div class="activity-image">
+					<img v-bind:src="activityInfo.imageUrl" />
+				</div>
+				<div class="activity-con-box">
+					<div class="activity-title">{{activityInfo.name}}</div>
+					<div class="activity-con" v-html="activityInfo.detail"></div>
+					<div class="activity-info">
+						<div class="info-list">
+							<span>开始时间：</span>{{activityInfo.beginTime}}
+						</div>
+						<div class="info-list">
+							<span>结束时间：</span>{{activityInfo.endTime}}
+						</div>
+						<div class="info-list">
+							<span>活动地点：</span>{{activityInfo.address}}
+						</div>
+						<div class="info-list">
+							<span>参加人数：</span>{{activityInfo.availablePeople}}人
+						</div>
+						<div class="info-list">
+							<span>活动费用：</span>{{activityInfo.activityFee}}元
+						</div>
+						<div class="info-list">
+							<span>联系人：</span>{{activityInfo.charger}}
+						</div>
+						<div class="info-list">
+							<span>电话：</span>{{activityInfo.chargerTelephone}}
+						</div>
+						<div class="info-list">
+							<span>报名截止：</span>{{activityInfo.deadLineTime}}
+						</div>
+					</div>
+				</div>
+				<div class="activity-btn-box">
+					<div class="activity-btn">
+						<a href="http://a.app.qq.com/o/simple.jsp?pkgname=shanxiang.com.linklive">下载邻客</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.activityInfo = {};
+		loadVue(param);
+
+		function loadActivityInfo() {
+			var id = getQueryString("id");
+			var param = {
+				id: id
+			}
+			request('POST', '/shop/activity/queryList.do', param, true, function(res) {
+				var activityInfo = res.data[0];
+				activityInfo.activityFee = parseFloat(activityInfo.activityFee).toFixed(2);
+				activityInfo.imageUrl = imgUrl + activityInfo.imageUrl;
+				setData.activityInfo = activityInfo;
+			}, function(res) {
+				layer.msg("活动详情加载失败");
+			})
+		}
+		loadActivityInfo();
+	</script>
+
+</html>

@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>支付结果</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app">
+			<!--<div class="app-title">
+				<div class="left back icon-back-white" onclick="goBack(-2);"></div>
+				<div class="title title-color-white">支付结果</div>
+			</div>-->
+			<div class="c-box">
+				<div class="result-box">
+					<div class="icon-result"></div>
+					<div class="text"></div>
+				</div>
+				<div class="result-btn-box">
+					<div class="result-btn">
+						<a href="index.html">返回首页</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			var pay_flag = getQueryString("pay_flag");
+			if(pay_flag == 'ok') {
+				$(".icon-result").addClass("icon-pay-ok");
+				$(".result-box .text").text("支付成功");
+			} else if(pay_flag == 'fail') {
+				$(".icon-result").addClass("icon-pay-fail");
+				$(".result-box .text").text("支付失败");
+			}
+		})
+	</script>
+
+</html>

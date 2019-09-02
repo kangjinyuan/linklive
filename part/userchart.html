@@ -1,0 +1,128 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/echarts-all-3.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="full-box">
+				<div class="chart-list-canvas-box"></div>
+			</div>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+		var userChart = echarts.init($(".chart-list-canvas-box").get(0));
+
+		function loadData() {
+			var param = {};
+			request("POST", "/statistics/person/record.do", param, true, function(res) {
+				var userInfo = res.data;
+				var userType = ["登记业主", "员工数", "注册用户", "活跃用户"];
+				var userValue = [userInfo.proprietorCount, userInfo.staffCount, userInfo.registerCount, userInfo.activeCount];
+				userChart.setOption({
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+					},
+					grid: {
+						left: "50",
+						right: "10",
+						top: "20"
+					},
+					xAxis: [{
+						type: 'category',
+						data: userType,
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					yAxis: [{
+						type: 'value',
+						axisLabel: {
+							interval: 0,
+							textStyle: {
+								color: "#666"
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						},
+						axisLine: {
+							show: true,
+							lineStyle: {
+								color: ["#e5e5e5"]
+							}
+						}
+					}],
+					series: [{
+						name: '人数（人）',
+						type: 'bar',
+						barWidth: 30,
+						label: {
+							normal: {
+								show: true,
+								position: "top",
+								textStyle: {
+									color: "#359df5"
+								}
+							}
+						},
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 1, 0, 0, [{
+											offset: 0,
+											color: '#359df5'
+										},
+										{
+											offset: 1,
+											color: '#7bc8ff'
+										}
+									]
+								),
+								barBorderRadius: 10
+							}
+						},
+						data: userValue
+					}]
+				}, true);
+			}, function(res) {
+				layer.msg("社区人员情况加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

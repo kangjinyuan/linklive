@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>物业费</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app app-shop-padding-bottom VDOM" v-cloak>
+			<div class="c-box">
+				<div class="form-box box-shadow">
+					<div class="form-list" onclick="rooms();">
+						<div class="more"></div>
+						<div class="form-list-name">缴费地址</div>
+						<div class="form-list-value form-margin-right">
+							{{roomInfo?roomInfo.buildingCode+'号楼'+roomInfo.unit+"单元"+roomInfo.code:"请选择缴费地址"}}
+						</div>
+					</div>
+					<div class="form-list">
+						<div class="form-list-name">建筑面积</div>
+						<div class="form-list-value">{{roomInfo.area}}平</div>
+					</div>
+					<div class="form-list">
+						<div class="form-list-name">收费标准</div>
+						<div class="form-list-value">{{roomInfo.feeValue}}元/平/月</div>
+					</div>
+					<div class="form-list">
+						<div class="form-list-name">缴费金额</div>
+						<ul class="form-list-tab-box">
+							<li v-for="t in dataList" v-bind:class="t.isActive?'selected':''" v-on:click="selectFeeConfig(t);">
+								<div class="form-list-tab-name">{{t.monthCount}}个月</div>
+								<div class="form-list-tab-value">
+									<div class="form-list-tab-value-text-box">
+										<div v-bind:class="['form-list-tab-text-title',t.discount == 0 && t.discountValue == 0?'form-list-tab-text-no-dir':'']"><span>￥</span>{{t.shouldPayFee}}</div>
+										<div class="form-list-tab-text-dir" v-if="t.discount > 0 && t.discountValue > 0">-￥{{t.discountValue}}</div>
+										<div class="form-list-tab-text-dir" v-if="t.discount == 0 && t.discountValue > 0">-￥{{t.discountValue}}</div>
+										<div class="form-list-tab-text-dir" v-if="t.discount > 0 && t.discountValue == 0">打{{t.discount}}折</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="tips-box">注：物业费=建筑面积*收费标准*月数</div>
+			</div>
+			<div class="pay-box">
+				<div class="pay-btn" onclick="pay();">立即支付 <span>￥</span>{{shouldPayFee}}</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var telephone = getQueryString("telephone");
+		param.roomInfo = "";
+		param.shouldPayFee = "0.00";
+		param.feeConfigId = "";
+		loadVue(param);
+
+		function rooms() {
+			window.location.href = "rooms.html?telephone=" + telephone + "&roomId=" + setData.roomInfo.id;
+		}
+
+		function selectFeeConfig(obj) {
+			var dataList = setData.dataList;
+			for(var i = 0; i < dataList.length; i++) {
+				dataList[i].isActive = false;
+				if(obj.id == dataList[i].id) {
+					dataList[i].isActive = !dataList[i].isActive;
+					setData.feeConfigId = obj.id;
+					setData.shouldPayFee = obj.shouldPayFee;
+				}
+			}
+		}
+
+		function pay() {
+			var feeConfigId = setData.feeConfigId;
+			var roomInfo = setData.roomInfo;
+			if(feeConfigId == "") {
+				layer.msg("请选择缴费金额");
+				return false;
+			}
+			var param = {
+				feeConfigId: feeConfigId,
+				roomId: roomInfo.id
+			}
+			request("POST", "/property/billCollection/confirmOrder.do", param, true, function(res) {
+				jumpGd(telephone, "1");
+			}, function(res) {
+				layer.msg("生成账单失败，请检查您的网络或重试");
+			});
+		}
+
+		function getRoomInfo() {
+			var param = {
+				telephone: telephone
+			}
+			request('POST', '/property/rooms/findRoomsByTelephone.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].area = parseFloat(dataList[i].area).toFixed(2);
+					dataList[i].feeValue = parseFloat(dataList[i].feeValue).toFixed(2);
+				}
+				if(roomInfo) {
+					for(var i = 0; i < dataList.length; i++) {
+						if(roomInfo.id == dataList[i].id) {
+							setData.roomInfo = dataList[i];
+						}
+					}
+				} else {
+					roomInfo = dataList[0];
+					window.localStorage.setItem("roomInfo", JSON.stringify(roomInfo));
+					setData.roomInfo = roomInfo;
+				}
+				loadFeeConfig();
+			}, function(res) {
+				layer.msg("房屋列表查询失败，请检查您的网络或重试");
+			})
+		}
+
+		function loadFeeConfig() {
+			var roomInfo = setData.roomInfo;
+			var param = {
+				pageSize: "10000"
+			};
+			request("POST", "/property/feeConfig/queryList.do", param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					var totalFee = roomInfo.feeValue * roomInfo.area * dataList[i].monthCount;
+					dataList[i].isActive = false;
+					var discount = dataList[i].discount = dataList[i].discount ? parseFloat(dataList[i].discount).toFixed(2) : 0;
+					var discountValue = dataList[i].discountValue = parseFloat(dataList[i].discountValue).toFixed(2);
+					if(discount > 0 && discountValue > 0) {
+						dataList[i].shouldPayFee = totalFee - discountValue;
+					} else if(discount > 0 && discountValue == 0) {
+						dataList[i].shouldPayFee = totalFee * (discount / 10);
+					} else if(discount == 0 && discountValue > 0) {
+						dataList[i].shouldPayFee = totalFee - discountValue;
+					} else {
+						dataList[i].shouldPayFee = totalFee;
+					}
+					dataList[i].shouldPayFee = parseFloat(dataList[i].shouldPayFee).toFixed(2);
+				}
+				setData.dataList = dataList;
+			}, function(res) {
+				layer.msg("缴费规则加载失败，请检查您的网络或重试");
+			})
+		}
+
+		getRoomInfo();
+	</script>
+
+</html>

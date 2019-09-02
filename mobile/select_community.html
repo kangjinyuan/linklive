@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客社区服务</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/app.css?v=a088f059e3" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/suitphone.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/fontchangeletter.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/app.js?v=738ebb1c88"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="sreach-box">
+				<div class="sreach">
+					<div class="sreach-input">
+						<input type="text" name="" value="" id="name" placeholder="请输入社区名称" oninput="setCommunity();" />
+					</div>
+				</div>
+			</div>
+			<ul class="letter-box" v-if="isNoData == false">
+				<li v-for="t in communityList">
+					<a v-bind:href="t.anchor">{{t.code}}</a>
+				</li>
+			</ul>
+			<div class="full-box" v-if="isNoData">
+				<div class="no-data-box">
+					<div class="icon icon-address"></div>
+					<div class="text">当前没有社区信息</div>
+				</div>
+			</div>
+			<div class="c-box" v-else>
+				<div class="letter-list-box">
+					<div class="letter-list" v-for="t in communityList" v-if="t.community.length > 0">
+						<a v-bind:name="t.code"></a>
+						<div class="letter-list-code">{{t.code}}</div>
+						<div class="letter-list-value-box" v-for="community in t.community">
+							<div class="letter-list-value" v-on:click="selectCommunity(community)">{{community.name}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.isNoData = true;
+		param.communityList = [];
+		loadVue(param);
+
+		function selectCommunity(obj) {
+			if(obj.postPayCode) {
+				window.location.href = "https://yaoyao.cebbank.com/LifePayment/webApp/h5/router.html?transType=01&canalType=13&canal=bjsx&ItemCode=" + obj.postPayCode;
+			} else {
+				layer.msg("该社区暂不支持在线缴费");
+			}
+		}
+
+		function setCommunity() {
+			var communityList = [];
+			var dataList = setData.dataList;
+			var pinYinValue = $("#name").val().toUpperCase();
+			let pinYinArray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"];
+			for(var i = 0; i < pinYinArray.length; i++) {
+				var obj = {
+					code: pinYinArray[i],
+					anchor: "#" + pinYinArray[i],
+					community: []
+				}
+				communityList.push(obj);
+			}
+			for(var i = 0; i < dataList.length; i++) {
+				var pinYinName = getPinYinByName(dataList[i].name).toUpperCase();
+				if(dataList[i].name.indexOf($("#name").val()) > -1 || pinYinName.indexOf(pinYinValue) > -1) {
+					var code = pinYinName.split("")[0];
+					for(var j = 0; j < communityList.length; j++) {
+						if(code == communityList[j].code) {
+							communityList[j].community.push(dataList[i]);
+						} else if(isNaN(code) == false) {
+							if(communityList[j].code == "#") {
+								communityList[j].community.push(dataList[i]);
+								break;
+							}
+						}
+					}
+				}
+			}
+			var isNoData = setData.isNoData;
+			for(var i = 0; i < communityList.length; i++) {
+				if(communityList[i].community.length > 0) {
+					isNoData = false;
+					break;
+				} else {
+					isNoData = true;
+				}
+			}
+			setData.isNoData = isNoData;
+			setData.communityList = communityList;
+		}
+
+		function loadData() {
+			var param = {
+				pageSize: "10000"
+			}
+			request("POST", "/property/community/queryList.do", param, true, function(res) {
+				setData.dataList = res.data;
+				setCommunity();
+			}, function(res) {
+				layer.msg("社区加载失败，请检查您的网络或重试");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>确认订单</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/photoloadinit.js"></script>
+		<script src="../../js/photoload.js"></script>
+		<script src="../../js/postUrl.js?v=1c9fac12bd"></script>
+		<script src="../../js/app.js?v=d3dccea598"></script>
+	</head>
+
+	<body>
+		<div class="app app-padding-bottom VDOM" v-cloak>
+			<div class="main pay-info">
+				<a href="address.html">
+					<div class="pay-address-box">
+						<div class="pay-address">
+							<div class="user-box" v-if="addressInfo">
+								<div class="user-info">{{addressInfo.name}} {{addressInfo.telephoneText}}</div>
+								<div class="user-address">{{addressInfo.province}}{{addressInfo.city}}{{addressInfo.county}}{{addressInfo.address}}</div>
+							</div>
+							<div class="add-address" v-else>添加收货地址</div>
+							<div class="more"></div>
+						</div>
+						<div class="line"></div>
+					</div>
+				</a>
+				<div class="list-box" v-for="order in orderList">
+					<div class="list" v-for="sku in order.skuList">
+						<div class="list-con">
+							<div class="pay-shop-img">
+								<img v-bind:src="sku.skuInfo.image" onerror="this.src='../../img/no-img.png'" />
+							</div>
+							<div class="pay-shop-info">
+								<div class="pay-shop-title">{{sku.skuInfo.commodityName}}</div>
+								<div class="pay-shop-rule"><span v-for="combination in sku.skuInfo.combinationList">{{combination}}</span></div>
+								<div class="pay-shop-num">
+									<div class="price">￥{{sku.skuInfo.price}}</div>
+									<div class="num"><span>X</span>{{sku.quantity}}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="list-box">
+					<div class="list">
+						<div class="list-con">
+							<div class="list-con-title">
+								运费
+							</div>
+							<div class="list-con-text">￥0.00</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="pay-box">
+				<div class="pay-info-box">
+					<div class="price">实付款：<span>￥{{totalFee}}</span></div>
+					<div class="pay-info-pay-btn" onclick="billOrder();">提交订单</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var bill_flag = getQueryString("bill_flag");
+		param.totalFee = 0;
+		param.orderList = JSON.parse(decodeURIComponent(getQueryString("orderList")))
+		param.addressInfo = "";
+		loadVue(param);
+
+		function billOrder() {
+			var addressInfo = setData.addressInfo;
+			var orderList = setData.orderList;
+			if(addressInfo == "") {
+				layer.msg("收货地址不能为空");
+				return false;
+			}
+			var idList = [];
+			var quantity = "";
+			for(var i = 0; i < orderList.length; i++) {
+				var skuList = orderList[i].skuList;
+				for(var j = 0; j < skuList.length; j++) {
+					idList.push(skuList[j].skuInfo.id);
+					if(bill_flag == 0) {
+						quantity = skuList[j].quantity;
+					}
+				}
+			}
+			//bill_flag = 0立即下单bill_flag = 1购物车下单
+			if(bill_flag == 0) {
+				var skuId = idList[0];
+				var param = {
+					name: addressInfo.name,
+					telephone: addressInfo.telephone,
+					address: addressInfo.province + addressInfo.city + addressInfo.county + addressInfo.address,
+					skuId: skuId,
+					quantity: quantity
+				}
+				request('POST', '/shop/order/instantOrder.do', param, true, function(res) {
+					var orderInfo = encodeURIComponent(JSON.stringify(res.data));
+					window.location.href = "pay_way.html?orderInfo=" + orderInfo;
+				}, function(res) {
+					layer.msg("提交订单失败，请检查网络或重试");
+				})
+			} else {
+				var param = {
+					name: addressInfo.name,
+					telephone: addressInfo.telephone,
+					address: addressInfo.province + addressInfo.city + addressInfo.county + addressInfo.address,
+					idList: idList
+				}
+			}
+		}
+
+		function loadData() {
+			var param = {
+				isDefault: 1
+			}
+			request('POST', '/account/address/queryList.do', param, true, function(res) {
+				var orderList = setData.orderList;
+				var totalFee = 0;
+				for(var i = 0; i < orderList.length; i++) {
+					var skuList = orderList[i].skuList;
+					for(var j = 0; j < skuList.length; j++) {
+						var skuInfo = skuList[j].skuInfo;
+						var quantity = skuList[j].quantity;
+						totalFee += parseFloat(skuInfo.price) * quantity;
+					}
+				}
+				setData.totalFee = totalFee.toFixed(2);
+				var addressList = res.data;
+				if(addressList.length > 0) {
+					var addressInfo = res.data[0];
+					addressInfo.telephoneText = resetTelephone(addressInfo.telephone);
+					setData.addressInfo = addressInfo;
+				}
+			}, function(res) {
+				layer.msg("默认收获地址加载失败，请检查网络或重试");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

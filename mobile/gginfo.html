@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客社区公告</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<meta http-equiv="cache-control" content="public">
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/app.css?v=a088f059e3" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/suitphone.js"></script>
+		<script src="../js/photoloadinit.js"></script>
+		<script src="../js/photoload.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/app.js?v=738ebb1c88"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<div class="announcement-info">
+				<div class="title">{{announcementInfo.title}}</div>
+				<div class="dir-box">
+					<div class="author">{{announcementInfo.author}}</div>
+					<div class="time">{{announcementInfo.createTime | resetTime(1)}}</div>
+				</div>
+				<div class="con" v-html="announcementInfo.content">
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.announcementInfo = {};
+		loadVue(param);
+
+		//		新增浏览量
+		function addPageView() {
+			var param = {
+				communityId: setData.announcementInfo.communityId,
+				id: setData.announcementInfo.id,
+			}
+			request('POST', '/property/announcement/increasePageView.do', param, true, function(res) {}, function(res) {
+				layer.msg("新增浏览量失败");
+			})
+		}
+
+		function loaddata(options) {
+			var res = JSON.parse(options);
+			setData.announcementInfo.id = res.id;
+			setData.announcementInfo.communityId = res.communityId;
+			var param = {
+				communityId: setData.announcementInfo.communityId,
+				id: setData.announcementInfo.id,
+				isPublish: "1"
+			}
+			request('POST', '/property/announcement/queryList.do', param, true, function(res) {
+				setData.announcementInfo = res.data[0];
+				//addPageView();
+			}, function(res) {
+				layer.msg("公告详情加载失败");
+			})
+		}
+	</script>
+
+</html>

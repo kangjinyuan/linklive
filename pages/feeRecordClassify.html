@@ -1,0 +1,120 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="KJYBOX VDOM" v-cloak>
+			<div class="KJY_title">费用类别管理</div>
+			<div class="searchbox">
+				<div class="search_text">
+					<div class="search">
+						<div class="searchname">类别名称：</div>
+						<div class="searchvalue">
+							<input type="text" name="" value="" id="" placeholder="输入类别名称" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btnbox">
+				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div class="btn icon icon-add" onclick="showmask(0,'','新建费用类别')">新建费用类别</div>
+				<div class="btn icon icon-del" onclick="del();">删除</div>
+				<div class="btn icon icon-log" onclick="openlog('0','费用类别管理操作记录')">操作记录</div>
+			</div>
+			<div class="KJY_table">
+				<table>
+					<thead>
+						<tr>
+							<th class="padding20">
+								<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+							<th>费用类别名称</th>
+							<th>创建时间</th>
+							<th>备注</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+
+					<tbody id="tbody">
+						<tr>
+							<td class="padding20">
+								<div class="no-check" onclick="selectOneData()"></div>1</td>
+							<td>物业费</td>
+							<td>2018-7-11</td>
+							<td>闪向</td>
+							<td>
+								<div class="btn icon icon-edit" v-on:click="showmask(0,1,'编辑费用类别')">编辑</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadPage();
+
+		//新建或编辑
+		function showmask(flag, obj, title) {
+			openMask(obj.id, "../part/feeRecordClassify", title, "460px", "300px", function(layerDom, layerIframe) {
+				layerDom.find("#name").val(obj.name);
+				layerDom.find("#charger").val(obj.charger);
+				layerDom.find("#chargerTelephone").val(obj.chargerTelephone);
+				layerDom.find("#account").val(obj.account);
+				layerDom.find("#description").val(obj.description);
+				judeaddorsee(flag, layerDom);
+			})
+		}
+
+		//删除数据
+		function del() {
+			delData("确定删除所选费用类别吗？", function(param) {
+				request('POST', '/property/administrator/delete.do', param, true, function(res) {
+					loadData();
+					layer.closeAll('dialog');
+				}, function(res) {
+					layer.msg("删除失败，请检查网络或重试");
+				})
+			})
+		}
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				blur: $("#salerName").val(),
+				gender: $("#gender").val()
+			};
+			request('POST', '/account/saler/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
+				setData.allisActive = false;
+			}, function() {
+				layer.msg("费用类别加载失败");
+			})
+		}
+	</script>
+
+</html>

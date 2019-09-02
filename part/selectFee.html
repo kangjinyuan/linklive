@@ -1,0 +1,135 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask VDOM" v-cloak>
+			<div class="search-box" v-if="parentData.flag != 1">
+				<div class="search-text">
+					<div class="search">
+						<div class="search-name">项目名称：</div>
+						<div class="search-value">
+							<input type="text" name="" value="" id="feeName" placeholder="输入项目名称" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-box" v-if="parentData.flag != 1">
+				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+			</div>
+			<div class="kjy-data-box">
+				<div class="full-box" v-if="dataList.length == 0">
+					<div class="no-data-box">
+						<div class="icon icon-no-data"></div>
+						<div class="no-data-text">暂时没有缴费项目哦</div>
+					</div>
+				</div>
+				<div class="kjy-table" v-else>
+					<table>
+						<thead>
+							<th class="padding20">序号</th>
+							<th>项目名称</th>
+							<th>计费单价（元）</th>
+							<th>项目属性</th>
+							<th>计算公式</th>
+						</thead>
+						<tbody>
+							<tr v-for="(t,i) in dataList" v-on:click="tabData(t)">
+								<td class="padding20">
+									<div v-bind:class="['radio-no-check',t.isActive?'radio-checked':'']"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+								<td>{{t.feeName}}</td>
+								<td>{{t.fee}}</td>
+								<td>{{t.feePropertyText}}</td>
+								<td>{{t.calculateTypeText}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-box"></div>
+		</div>
+	</body>
+	<script>
+		loadSmallPage();
+
+		//确定上一级页面参数
+		function setParentData() {
+			var parentData = setData.parentData;
+			if(parentData.flag == 0 || parentData.flag == 2) {
+				$("#" + parentData.feeName, window.parent.document).val(sInfo.feeName);
+			} else if(parentData.flag == 1) {
+				$("#" + parentData.feeValue, window.parent.document).val(sInfo.fee);
+			}
+			$("#" + parentData.feeId, window.parent.document).val(sInfo.id);
+		}
+
+		//		加载数据
+		function loadData(parentData) {
+			if(parentData.flag == 0) {
+				var param = {
+					page: page,
+					feeProperty: "0",
+					feeName: $("#feeName").val()
+				};
+			} else if(parentData.flag == 1) {
+				var param = {
+					page: page,
+					feeName: "物业费"
+				};
+			} else if(parentData.flag == 2) {
+				var param = {
+					page: page,
+					feeProperty: "0",
+					calculateType: "0",
+					feeName: $("#feeName").val()
+				};
+			}
+			request('POST', '/property/fee/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					dataList[i].fee = parseFloat(dataList[i].fee).toFixed(2);
+					if(dataList[i].calculateType == 0) {
+						dataList[i].calculateTypeText = "自定义费用";
+					} else if(dataList[i].calculateType == 1) {
+						dataList[i].calculateTypeText = "单价*数量";
+					}
+					if(dataList[i].feeProperty == 0) {
+						dataList[i].feePropertyText = "后付费";
+					} else if(dataList[i].feeProperty == 1) {
+						dataList[i].feePropertyText = "预付费";
+					}
+					if(parentData.flag == 2) {
+						var feeName = dataList[i].feeName;
+						if(feeName.indexOf("固定停车费") > -1) {
+							dataList.splice(i--, 1);
+						}
+					}
+				}
+				setData.dataList = dataList;
+				setData.parentData = parentData;
+			}, function() {
+				layer.msg("缴费项目加载失败");
+			})
+		}
+	</script>
+
+</html>

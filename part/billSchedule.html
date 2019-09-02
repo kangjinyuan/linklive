@@ -1,0 +1,214 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>邻客社区平台</title>
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../layui/css/layui.css" />
+		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../layui/layui.all.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/postUrl.js?v=2f85f2877b"></script>
+		<script src="../js/common.js?v=e0666996b7"></script>
+	</head>
+
+	<body>
+		<div class="main-mask main-mask-bottom VDOM" v-cloak>
+			<div class="con">
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">账单名称</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" id="title" value="" class="required big len30" />
+						<div class="mask-list-prompt">账单名称不超过30个字</div>
+					</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">缴费项目</span>：</div>
+					<div class="mask-list-value">
+						<input type="text" name="" value="" id="feeName" disabled="disabled" class="required" />
+						<input type="hidden" name="" value="" id="feeId" class="required" />
+					</div>
+					<div class="btn icon icon-select" onclick="selectFee();">选择缴费项目</div>
+				</div>
+				<div class="mask-list">
+					<div class="mask-list-name"><span>*</span><span class="text">账单周期性</span>：</div>
+					<div class="mask-list-value mask-list200" id="jztimebox">
+						<select name="" id="jzcs" onchange="selectBillCycle(this)" class="required">
+							<option value="">==请选择收费次数==</option>
+							<option value="1">1次</option>
+							<option value="2">2次</option>
+							<option value="3">3次</option>
+							<option value="4">4次</option>
+							<option value="5">5次</option>
+							<option value="6">6次</option>
+							<option value="7">7次</option>
+							<option value="8">8次</option>
+							<option value="9">9次</option>
+							<option value="10">10次</option>
+							<option value="11">11次</option>
+							<option value="12">12次</option>
+						</select>
+						<input type="text" name="" value="" placeholder="本月几号" class="hide-box jzday margin-top-small num num-box" />
+						<div class="hide-box mask-list-prompt">用于按月收取费用，只能填写数字，填写之后，每月X号收取相应费用</div>
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime0 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime1 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime2 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime3 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime4 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime5 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime6 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime7 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime8 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime9 margin-top-small" />
+						<input type="text" value="" name="" placeholder="填写截止时间" class="hide-box jztime10 margin-top-small" />
+					</div>
+				</div>
+				<div class="mask-list c_b">
+					<div class="mask-list-name"><span>*</span><span class="text">推送范围</span>：</div>
+					<div class="mask-list-value">
+						<div class="no-range-box" v-if="dataList.length == 0">暂无推送范围</div>
+						<ul v-else class="range-box">
+							<li v-for="(t,i) in dataList">
+								{{t.code}}号楼
+								<div class="del-range" v-on:click="delRange(i);"></div>
+							</li>
+						</ul>
+						<div class="btn icon icon-select" onclick="selectRange();">推送范围</div>
+					</div>
+				</div>
+			</div>
+			<div class="mask-btn-box">
+				<div class="btn-box">
+					<div class="btn icon icon-save" onclick="edit();" id="creatsave">确定</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function() {
+			setTime('.jztime0', "date");
+			setTime('.jztime1', "date");
+			setTime('.jztime2', "date");
+			setTime('.jztime3', "date");
+			setTime('.jztime4', "date");
+			setTime('.jztime5', "date");
+			setTime('.jztime6', "date");
+			setTime('.jztime7', "date");
+			setTime('.jztime8', "date");
+			setTime('.jztime9', "date");
+			setTime('.jztime10', "date");
+		})
+
+		loadVue(param);
+
+		//选择费用生成次数
+		function selectBillCycle(t) {
+			$(".hide-box").hide().removeClass("required");
+			if($(t).val() == 12) {
+				$(".jzday").show().addClass("required");
+				$(".masklist_prompt").show();
+			} else {
+				for(var i = 0; i < $(t).val(); i++) {
+					$(".jztime" + i).show().addClass("required");
+				}
+				$(".jzday").hide().removeClass("required");
+				$(".masklist_prompt").hide();
+			}
+		}
+
+		function selectFee() {
+			openMask('', "selectFee", "选择缴费项目", "98%", "98%", function(layerDom, layerIframe) {
+				var parentData = {
+					flag: 2,
+					feeName: "feeName",
+					feeId: "feeId"
+				}
+				layerIframe[0].contentWindow.loadData(parentData);
+			})
+		}
+
+		//选择推送范围
+		function selectRange() {
+			openMask('', "selectBillScheduleRange", "选择推送范围", "98%", "98%", function(layerDom, layerIframe) {
+				layerIframe[0].contentWindow.loadData(setData.dataList);
+			})
+		}
+
+		//编辑
+		function edit() {
+			var checkI = checkInput();
+			if(checkI == true) {
+				var dateList = [];
+				if($("#jzcs").val() == 12) {
+					var date = new Date();
+					var Y = date.getFullYear() + "-";
+					for(var i = 0; i < 12; i++) {
+						dateList.push(resetTime(Y + (i + 1) + "-" + $(".jzday").val(), 0));
+					}
+				} else {
+					for(var i = 0; i < $("#jzcs").val(); i++) {
+						dateList.push(resetTime($(".jztime" + i).val(), 0));
+					}
+				}
+				var buildingList = [];
+				var dataList = setData.dataList;
+				for(var i = 0; i < dataList.length; i++) {
+					buildingList.push(dataList[i].id);
+				}
+				if(buildingList.length == 0) {
+					layer.msg("请选择账单推送范围");
+					return false;
+				}
+
+				if(buildingList.length > 10) {
+					layer.msg("推送范围不能超过10个楼宇");
+					return false;
+				}
+				var param = {
+					title: $("#title").val(),
+					feeId: $("#feeId").val(),
+					feeName: $("#feeName").val(),
+					dateList: dateList,
+					buildingList: buildingList
+				};
+				request('POST', '/property/billSchedule/save.do', param, true, function(res) {
+					parent.layer.close(index);
+					parent.layer.msg("操作成功");
+				}, function(res) {
+					if(res.code == "0009") {
+						layer.msg("所选楼宇中有房屋信息未完善，请先完善房屋信息");
+					} else {
+						layer.msg('操作失败，请检查网络或重试');
+					}
+				})
+			}
+		}
+
+		function loadBuildings(idList, callback) {
+			if(idList) {
+				var param = {
+					page: page,
+					idList: idList
+				};
+				request('POST', '/property/buildings/queryList.do', param, true, function(res) {
+					setData.dataList = res.data;
+				}, function() {
+					layer.msg("楼宇加载失败");
+				})
+				nextTick(function() {
+					callback();
+				})
+			}
+		}
+	</script>
+
+</html>

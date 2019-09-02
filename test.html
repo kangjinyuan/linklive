@@ -1,0 +1,85 @@
+﻿<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+		<style type="text/css">
+			#container,
+			html,
+			body {
+				height: 100%;
+			}
+			
+			.color {
+				width: 5rem;
+				height: 0.6rem;
+				display: inline-block;
+				margin: 0 1rem;
+			}
+			
+			.info {
+				min-width: 10rem;
+			}
+		</style>
+		<title>驾车轨迹纠偏</title>
+	</head>
+
+	<body>
+		<div id="container" tabindex="0" v-cloak></div>
+	</body>
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="layui/layui.all.js"></script>
+	<script src="js/postUrl.js?v=2f85f2877b"></script>
+	<script src="js/common.js?v=e0666996b7"></script>
+	<script language="javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.GraspRoad"></script>
+	<script type="text/javascript">
+		loadVue(param)
+		var map = new AMap.Map('container', {
+			zoom: 20,
+			center: [communityInfo.longitude, communityInfo.latitude]
+		})
+
+		//		加载数据
+		function loadData() {
+			var param = {
+				page: page,
+				pageSize: "1000",
+				taskId: "92"
+			}
+			request('POST', '/property/patrolTrack/queryList.do', param, true, function(res) {
+				var dataList = res.data;
+				var polylines = [];
+				for(var i = 0; i < dataList.length; i++) {
+					if(dataList[i + 1]) {
+						var lnglat1 = new AMap.LngLat(dataList[i].longitude, dataList[i].latitude);
+						var lnglat2 = new AMap.LngLat(dataList[i + 1].longitude, dataList[i + 1].latitude);
+						var distance = lnglat1.distance(lnglat2);
+						if(distance > 30) {
+							polylines.push(lnglat1);
+						}
+					}
+				}
+				var polyline = new AMap.Polyline({
+					path: polylines,
+					borderWeight: 8,
+					strokeColor: '#3e8eff',
+					lineJoin: 'round',
+					showDir: true
+				});
+				map.add(polyline);
+				nextTick(function() {
+					if(setData.currentPage < setData.totalPage) {
+						nextPage();
+					}
+				})
+			}, function(res) {
+				layer.msg("巡更轨迹加载失败");
+			})
+		}
+		loadData();
+	</script>
+
+</html>

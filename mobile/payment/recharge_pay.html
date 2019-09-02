@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>邻客社区服务</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app app-child-page VDOM" v-cloak>
+			<div class="app-title">
+				<div class="left back icon-back-white" onclick="goBack(-1);"></div>
+				<div class="title title-color-white">房屋信息</div>
+			</div>
+			<div class="c-box">
+				<div class="recharge-box box-shadow">
+					<div class="select-list">
+						<div class="select-key">缴费社区</div>
+						<div class="select-value">{{roomInfo.communityName}}</div>
+					</div>
+					<div class="select-list">
+						<div class="select-key">缴费项目</div>
+						<div class="select-value">{{feeName}}</div>
+					</div>
+					<div class="select-list">
+						<div class="select-key">楼号</div>
+						<div class="select-value">{{roomInfo.buildingCode}}号楼</div>
+					</div>
+					<div class="select-list">
+						<div class="select-key">单元</div>
+						<div class="select-value">{{roomInfo.unit}}单元</div>
+					</div>
+					<div class="select-list">
+						<div class="select-key">房屋</div>
+						<div class="select-value">{{roomInfo.code}}室</div>
+					</div>
+					<div class="select-list">
+						<div class="select-key">支付金额</div>
+						<div class="select-value">
+							<input type="number" name="" value="" id="fee" placeholder="请输入支付金额" onkeyup="retain_twobit();" />
+						</div>
+					</div>
+				</div>
+				<div class="big-btn" onclick="pay();">去支付</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		param.roomInfo = {};
+		param.feeName = '';
+		loadVue(param);
+
+		$(function() {
+			judeClient(function() {
+				if(typeof WeixinJSBridge == "undefined") {
+					if(document.addEventListener) {} else if(document.attachEvent) {
+						document.attachEvent('WeixinJSBridgeReady', pay);
+						document.attachEvent('onWeixinJSBridgeReady', pay);
+					}
+				}
+			}, function() {}, function() {})
+		})
+
+		function retain_twobit() {
+			var str = $("#fee").val();
+			var y = str.indexOf(".") + 1;
+			var count = str.length - y;
+			if(y > 0) {
+				if(count > 2) {
+					layer.msg("最高保留小数点后两位");
+					$("#fee").val(str.slice(0, str.length - 1));
+				}
+			}
+		}
+
+		function pay() {
+			var roomInfo = setData.roomInfo;
+			var feeName = setData.feeName;
+			if($("#fee").val() == "") {
+				layer.msg("请输入支付金额");
+				return false;
+			}
+
+			if(!regular_fee.test($("#fee").val())) {
+				layer.msg("支付金额格式错误");
+				return false;
+			}
+
+			judeClient(function() {
+				var param = {
+					id: roomInfo.id,
+					accessCode: accessCode,
+					fee: $("#fee").val(),
+					feeName: feeName
+				}
+				request('POST', '/wx/payFee.do', param, true, function(res) {
+					var res = res;
+					WeixinJSBridge.invoke(
+						'getBrandWCPayRequest', {
+							"appId": res.data.appId,
+							"timeStamp": res.data.timeStamp,
+							"nonceStr": res.data.nonceStr,
+							"package": res.data.package,
+							"signType": "MD5",
+							"paySign": res.data.paySign
+						},
+						function(res) {
+							if(res.err_msg == "get_brand_wcpay_request:ok") {
+								window.location.href = "pay_result.html?pay_flag=ok";
+							} else if(res.err_msg == "get_brand_wcpay_request:cancel") {
+								layer.msg("支付取消", {
+									time: 2000
+								}, function() {
+									goBack(-1);
+								});
+							} else if(res.err_msg == "get_brand_wcpay_request:fail") {
+								window.location.href = "pay_result.html?pay_flag=fail";
+							}
+						}
+					);
+				}, function(res) {
+					window.location.href = "pay_result.html?pay_flag=fail";
+				})
+			}, function() {
+				layer.msg("请在微信公众号（邻客社区服务）中缴费");
+			}, function() {
+				layer.msg("请在微信公众号（邻客社区服务）中缴费");
+			})
+		}
+
+		function loadData() {
+			var feeName = getQueryString("feeName");
+			var roomId = getQueryString("roomId");
+			var param = {
+				id: roomId
+			}
+			request('POST', '/property/rooms/findRoomById.do', param, true, function(res) {
+				setData.roomInfo = res.data;
+				setData.feeName = feeName;
+			}, function(res) {
+				layer.msg("房屋信息查询失败，请检查网络或重试");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>

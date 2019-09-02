@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>我的地址</title>
+		<meta charset="utf-8">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<meta content="telephone=no" name="format-detection" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<!-- No Baidu Siteapp-->
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<!-- Add to homescreen for Chrome on Android -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<!-- Add to homescreen for Safari on iOS -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="stylesheet" href="../../css/reset.css" />
+		<link rel="stylesheet" href="../../css/app.css?v=eb93b00c3f" />
+		<script src="../../js/jquery-1.9.1.min.js"></script>
+		<script src="../../js/suitphone.js"></script>
+		<script src="../../layui/layui.all.js"></script>
+		<script src="../../js/vue.min.js"></script>
+		<script src="../../js/postUrl.js?v=f452d686fe"></script>
+		<script src="../../js/app.js?v=b8f6ed7b91"></script>
+	</head>
+
+	<body>
+		<div class="app VDOM" v-cloak>
+			<!--<div class="app-title">
+				<div class="left back icon-back-white" onclick="goBack(-1);"></div>
+				<div class="title title-color-white">房屋列表</div>
+			</div>-->
+			<div class="full-box" v-if="dataList.length == 0">
+				<div class="no-data-box">
+					<div class="icon icon-address"></div>
+					<div class="text">您还没有房屋哦！</div>
+				</div>
+			</div>
+			<ul class="c-box" v-else>
+				<li class="rooms-list-box box-shadow" v-for="t in dataList" v-on:click="selectRoomInfo(t)">
+					<div v-bind:class="['rooms-list',t.isActive?'icon-room-list icon-location':'']">
+						{{t.buildingCode}}号楼{{t.unit}}单元{{t.code}}
+					</div>
+				</li>
+			</ul>
+		</div>
+	</body>
+	<script>
+		loadVue(param);
+
+		function selectRoomInfo(roomInfo) {
+			window.localStorage.setItem("roomInfo", JSON.stringify(roomInfo));
+			goBack(-1);
+		}
+
+		function loadData() {
+			var telephone = getQueryString("telephone");
+			var roomId = getQueryString("roomId");
+			var param = {
+				telephone: telephone
+			}
+			request('POST', '/property/rooms/findRoomsByTelephone.do', param, true, function(res) {
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+					if(roomId == dataList[i].id) {
+						dataList[i].isActive = true;
+					}
+				}
+				setData.dataList = res.data;
+			}, function(res) {
+				layer.msg("房屋列表查询失败，请检查您的网络或重试");
+			})
+		}
+
+		loadData();
+	</script>
+
+</html>
