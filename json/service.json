@@ -1,51 +1,71 @@
 [{
 	"id" : "0",
 	"title" : "系统服务",
+	"icon" : "icon-set-up",
+	"selectIcon" : "icon-select-set-up",
 	"sort":"990",
 	"csub" : []
 },{
 	"id" : "1",
 	"title" : "物业基础信息",
+	"icon" : "icon-base-info",
+	"selectIcon" : "icon-select-base-info",
 	"sort":"999",
 	"csub" : []
 },{
 	"id" : "2",
 	"title" : "物业信息服务",
+	"icon" : "icon-info",
+	"selectIcon" : "icon-select-info",
 	"sort":"998",
 	"csub" : []
 },{
 	"id" : "3",
 	"title" : "物业品质服务",
+	"icon" : "icon-quality",
+	"selectIcon" : "icon-select-quality",
 	"sort":"995",
 	"csub" : []
 },{
 	"id" : "4",
 	"title" : "物业管理服务",
+	"icon" : "icon-property",
+	"selectIcon" : "icon-select-property",
 	"sort":"996",
 	"csub" : []
 },{
 	"id" : "5",
 	"title" : "财务信息",
+	"icon" : "icon-finance",
+	"selectIcon" : "icon-select-finance",
 	"sort":"997",
 	"csub" : []
 },{
 	"id" : "6",
 	"title" : "电子商务",
+	"icon" : "icon-shop",
+	"selectIcon" : "icon-select-shop",
 	"sort":"994",
 	"csub" : []
 },{
 	"id" : "7",
 	"title" : "邻里社交",
+	"icon" : "icon-social-contact",
+	"selectIcon" : "icon-select-social-contact",
 	"sort":"995",
 	"csub" : []
 },{
 	"id" : "8",
 	"title" : "消安综合",
+	"icon" : "icon-facility",
+	"selectIcon" : "icon-select-facility",
 	"sort":"992",
 	"csub" : []
 },{
 	"id" : "9",
 	"title" : "统计分析",
+	"icon" : "icon-statistics",
+	"selectIcon" : "icon-select-statistics",
 	"sort":"991",
 	"csub" : []
 }]

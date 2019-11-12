@@ -10,65 +10,78 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="css/reset.css" />
-		<link rel="stylesheet" href="css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="css/common.css?v=1c1ac2354f" />
 		<link rel="stylesheet" href="layui/css/layui.css" />
 		<link rel="stylesheet" href="layui/css/modules/layer/default/layer.css" />
-		<link rel="stylesheet" href="css/main.css?v=e0fae08235" />
+		<link rel="stylesheet" href="css/main.css?v=bbd6cba476" />
 		<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 		<script src="js/vue.min.js"></script>
 		<script src="layui/layui.js"></script>
 		<script src="layui/lay/modules/layer.js"></script>
-		<script src="js/postUrl.js?v=2f85f2877b"></script>
-		<script src="js/common.js?v=e0666996b7"></script>
-		<script type="text/javascript" src="js/rightNav.js?v=6120835142"></script>
-		<script src="js/init.js?v=baf3ad82f3"></script>
+		<script src="js/postUrl.js?v=62b1256164"></script>
+		<script src="js/common.js?v=fab245d574"></script>
+		<script type="text/javascript" src="js/rightNav.js?v=a741638c60"></script>
+		<script src="js/init.js?v=b3126b64e1"></script>
 
 	</head>
 
 	<body>
-		<div class="KJY VDOM" v-cloak>
-			<div class="header">
-				<div class="header-txt title f_l">邻客社区平台</div>
-				<div class="header-txt txt-udline icon icon-menu f_l hide-box" onclick="showMenu();">功能菜单</div>
-				<div class="header-txt txt-udline icon icon-left f_l" onclick="menuSwitch(this);">收起菜单</div>
-				<div class="header-txt txt-udline icon icon-time f_l"></div>
-				<div class="header-txt txt-udline icon icon-quit f_r" onclick="quit();">退出登录</div>
-				<div class="header-txt txt-udline icon icon-user f_r">{{username}}</div>
-				<div class="header-txt txt-udline f_r" onclick="changeCommunity();">当前小区：{{communityName}}</div>
-			</div>
-			<div class="main">
-				<div class="mainLeft f_l">
-					<ul class="layui-nav layui-nav-tree" lay-filter="test">
-						<li v-bind:class="['layui-nav-item',pt.show ? 'layui-nav-itemed' : '']" v-for="pt in dataList" v-if="pt.checked == true">
-							<a class="" href="javascript:;">{{pt.title}}</a>
-							<dl class="layui-nav-child">
-								<dd v-for="t in pt.csub" v-if="t.checked == true">
-									<a v-bind:class="t.icon" v-bind:data-page="t.page" v-bind:id="t.id">{{t.title}}</a>
-								</dd>
-							</dl>
+		<div class="kjy VDOM" v-cloak>
+			<div class="kjy-left-box f_l">
+				<div v-bind:class="['logo-box',menuSwitch?'':'logo-retract-box']">
+					<div class="logo-img"></div>
+					<div class="cut-line" v-if="menuSwitch"></div>
+					<div class="logo-text" v-if="menuSwitch">
+						<div class="logo-title">邻客社区平台</div>
+						<div class="logo-describe">LINKLIVE</div>
+					</div>
+				</div>
+				<div class="nav-box">
+					<ul class="layui-nav layui-nav-tree">
+						<li class="layui-nav-item" v-bind:data-select-icon="t.selectIcon" v-for="t in dataList" v-if="t.csub.length > 0">
+							<div class="disclick-box" v-if="!menuSwitch" v-on:mouseover="showChildMenu($event);"></div>
+							<a href="javascript:;">
+								<i v-bind:class="['icon', t.icon, menuSwitch?'':'icon-position-center']"></i>{{menuSwitch?t.title:''}}
+								<span class="layui-nav-more" v-if="menuSwitch"></span>
+							</a>
+							<div v-bind:class="['layui-nav-child',menuSwitch?'':'nav-child-box']" v-bind:onmouseleave="menuSwitch?'':'closeAllNav();'">
+								<ul v-for="t in t.csub">
+									<li>
+										<a href="javascript:;">{{t.title}}</a>
+										<dl class="layui-nav-child">
+											<dd v-for="t in t.csub">
+												<a v-bind:data-page="t.page" v-bind:data-id="t.id">{{t.title}}</a>
+											</dd>
+										</dl>
+									</li>
+								</ul>
+							</div>
 						</li>
 					</ul>
 				</div>
-				<div class="mainRight f_r">
-					<ul class="top-nav-box">
-						<li v-for="(t,i) in serviceList" v-bind:class="serviceIndex == i?'selected':''" v-if="t.csub.length > 0" v-on:click="tabService(i);">{{t.title}}</li>
+			</div>
+			<div class="kjy-right-box f_r">
+				<div class="user-info-box">
+					<div class="user-info-inner-box">
+						<div v-bind:class="['menu-switch','icon-menu-retract','f_l',menuSwitch?'':'icon-menu-open']" onclick="menuSwitch(this);"></div>
+						<div class="user-info-text f_l">{{currentTime}}</div>
+						<div class="user-info-text f_r">Hi,{{accountName}}[<span onclick="quit();">退出</span>]</div>
+						<div class="user-info-text icon icon-switch f_r" onclick="changeCommunity();">{{communityName}}</div>
+					</div>
+				</div>
+				<div class="layui-tab" lay-filter="kjy" lay-allowclose="true">
+					<ul class="layui-tab-title" id="rightNav">
+						<li class="layui-this" lay-id="">首页</li>
 					</ul>
-					<div class="rightCon">
-						<div class="layui-tab" lay-filter="KJY" lay-allowclose="true">
-							<ul class="layui-tab-title top_tab" id="rightNav">
-								<li class="layui-this" lay-id="">首页</li>
-							</ul>
-							<div class="layui-tab-content" id="rightIframe">
-								<div class="layui-tab-item layui-show">
-									<iframe v-bind:src="'index.html?timestamp='+timestamp" frameborder='0' marginheight='0' marginwidth='0' scrolling='yes' width='100%'></iframe>
-								</div>
-							</div>
+					<div class="layui-tab-content">
+						<div class="layui-tab-item layui-show">
+							<iframe v-bind:src="'index.html?timestamp='+timestamp" frameborder='0' marginheight='0' marginwidth='0' scrolling='yes' width='100%'></iframe>
 						</div>
 					</div>
-					<div class="rightFooter">copyright &copy; 北京闪向科技有限公司</div>
 				</div>
+				<div class="right-footer">copyright &copy; 北京闪向科技有限公司</div>
 			</div>
 		</div>
 	</body>

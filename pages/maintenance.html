@@ -10,136 +10,140 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">报修管理</div>
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					报修管理
+				</div>
+			</div>
 			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">报修人昵称：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="accountName" placeholder="输入报修人昵称" />
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">报修人昵称：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="accountName" placeholder="输入报修人昵称" />
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">报修手机号：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="accountTelephone" placeholder="输入报修手机号" />
+						<div class="search">
+							<div class="search-name">报修手机号：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="accountTelephone" placeholder="输入报修手机号" />
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">报修地址：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="reportAddress" placeholder="输入报修地址" />
+						<div class="search">
+							<div class="search-name">报修地址：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="reportAddress" placeholder="输入报修地址" />
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">报修类别：</div>
-						<div class="search-value">
-							<select name="" id="reportType" onchange="sreach();">
-								<option value="">==请选择报修类别==</option>
-								<option value="0">水</option>
-								<option value="1">电</option>
-								<option value="2">燃气</option>
-								<option value="3">门锁</option>
-								<option value="4">其他</option>
-							</select>
+						<div class="search">
+							<div class="search-name">报修类别：</div>
+							<div class="search-value">
+								<select name="" id="reportType" onchange="sreach();">
+									<option value="">==请选择报修类别==</option>
+									<option value="0">水</option>
+									<option value="1">电</option>
+									<option value="2">燃气</option>
+									<option value="3">门锁</option>
+									<option value="4">其他</option>
+								</select>
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">报修状态：</div>
-						<div class="search-value">
-							<select name="" id="reportState" onchange="sreach();">
-								<option value="">==请选择报修状态==</option>
-								<option value="0">申请中</option>
-								<option value="1">已接单</option>
-								<option value="2">已完成</option>
-								<option value="3">已评价</option>
-								<option value="4">已取消</option>
-							</select>
+						<div class="search">
+							<div class="search-name">报修状态：</div>
+							<div class="search-value">
+								<select name="" id="reportState" onchange="sreach();">
+									<option value="">==请选择报修状态==</option>
+									<option value="0">申请中</option>
+									<option value="1">已接单</option>
+									<option value="2">已完成</option>
+									<option value="3">已评价</option>
+									<option value="4">已取消</option>
+								</select>
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">维修人姓名：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="stuffName" placeholder="输入维修人姓名" />
+						<div class="search">
+							<div class="search-name">维修人姓名：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="stuffName" placeholder="输入维修人姓名" />
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<div class="btn icon icon-add" onclick="showMaintenance(0, '', '新建报修');">新建报修</div>
-				<!--<div class="btn icon icon-del" onclick="del();">删除</div>-->
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<div class="btn icon icon-add" onclick="showMaintenance(0, '', '新建报修');">新建报修</div>
+					<!--<div class="btn icon icon-del" onclick="del();">删除</div>-->
+				</div>
 			</div>
-			<div class="kjy-data-box">
-				<div class="full-box" v-if="dataList.length == 0">
-					<div class="no-data-box">
-						<div class="icon icon-no-data"></div>
-						<div class="no-data-text">暂时没有报修哦</div>
-					</div>
+			<div class="no-data-box" v-if="dataList.length == 0">
+				<div class="no-data-inner-box">
+					<div class="icon icon-no-data"></div>
+					<div class="no-data-text">暂时没有报修哦</div>
 				</div>
-				<div class="kjy-table" v-else>
-					<table>
-						<thead>
-							<tr>
-								<th>
-									<!--<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>-->
-									序号
-								</th>
-								<th>报修人昵称</th>
-								<th>报修手机号</th>
-								<th>报修地址</th>
-								<th>报修详情</th>
-								<th>报修类别</th>
-								<th>报修状态</th>
-								<th>报修评分</th>
-								<th>报修评价</th>
-								<th>维修人姓名</th>
-								<th>更新时间</th>
-								<th>创建时间</th>
-							</tr>
-						</thead>
+			</div>
+			<div class="kjy-table" v-else>
+				<table>
+					<thead>
+						<tr>
+							<th>
+								<!--<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>-->
+								序号
+							</th>
+							<th>报修人昵称</th>
+							<th>报修手机号</th>
+							<th>报修地址</th>
+							<th>报修详情</th>
+							<th>报修类别</th>
+							<th>报修状态</th>
+							<th>报修评分</th>
+							<th>报修评价</th>
+							<th>维修人姓名</th>
+							<th>更新时间</th>
+							<th>创建时间</th>
+						</tr>
+					</thead>
 
-						<tbody id="tbody">
-							<tr v-for="(t,i) in dataList">
-								<td>
-									<!--<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>-->
-									{{((currentPage-1)*20)+(i+1)}}
-								</td>
-								<td>{{t.accountName}}</td>
-								<td>{{t.accountTelephone}}</td>
-								<td>{{t.reportAddress}}</td>
-								<td>{{t.description?t.description:'暂无报修详情'}}</td>
-								<td>{{t.reportTypeText}}</td>
-								<td>{{t.reportStateText}}</td>
-								<td>{{t.scoreText}}</td>
-								<td>{{t.remark?t.remark:'暂无报修评价'}}</td>
-								<td>{{t.stuffName?t.stuffName:'暂无维修人'}}</td>
-								<td>{{t.updateTime}}</td>
-								<td>{{t.createTime}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+					<tbody id="tbody">
+						<tr v-for="(t,i) in dataList">
+							<td>
+								<!--<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>-->
+								{{((currentPage-1)*20)+(i+1)}}
+							</td>
+							<td>{{t.accountName}}</td>
+							<td>{{t.accountTelephone}}</td>
+							<td>{{t.reportAddress}}</td>
+							<td>{{t.description?t.description:'暂无报修详情'}}</td>
+							<td>{{t.reportTypeText}}</td>
+							<td>{{t.reportStateText}}</td>
+							<td>{{t.scoreText}}</td>
+							<td>{{t.remark?t.remark:'暂无报修评价'}}</td>
+							<td>{{t.stuffName?t.stuffName:'暂无维修人'}}</td>
+							<td>{{t.updateTime}}</td>
+							<td>{{t.createTime}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="page-box"></div>
 		</div>
 	</body>
 	<script>
-		loadPage();
-
 		function showMaintenance(flag, obj, title) {
 			openMask("", "../part/maintenance", title, "630px", "460px", function(layerDom, layerIframe) {
 				judeEdit(flag, layerDom);
@@ -211,7 +215,10 @@
 				layer.msg("报修列表加载失败");
 			})
 		}
-		loadData();
+
+		loadPage(0, function() {
+			loadData();
+		});
 	</script>
 
 </html>

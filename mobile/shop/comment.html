@@ -15,7 +15,7 @@
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../../css/reset.css" />
 		<link rel="stylesheet" href="../../css/swiper.min.css" />
 		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
@@ -48,7 +48,7 @@
 							<div class="comment-title">
 								<div class="user-info">
 									<div class="head-img">
-										<img v-bind:src="t.headImage" onerror="this.src='../../img/no-img.png'" />
+										<img v-bind:src="t.headImage" onerror="this.src='../../img/common/no-img.png'" />
 									</div>
 									<div class="user-name">{{t.nickName}}</div>
 								</div>
@@ -57,7 +57,7 @@
 							<div class="comment-con">
 								<div class="comment-con-text">{{t.content}}</div>
 								<div class="comment-con-img" v-if="t.imageList.length > 0">
-									<img v-for="image in t.imageList" v-bind:src="image+'?imageView2/1/w/220/h/220'" v-on:click="previewImage(image);" onerror="this.src='../../img/no-img.png'" />
+									<img v-for="image in t.imageList" v-bind:src="image+'?imageView2/1/w/220/h/220'" v-on:click="previewImage(image);" onerror="this.src='../../img/common/no-img.png'" />
 								</div>
 							</div>
 							<div class="comment-rule">{{t.combination}}</div>

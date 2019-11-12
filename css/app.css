@@ -17,7 +17,7 @@ body,html{background:#fff;}
 /*子页面底部边距*/
 .app-padding-bottom{margin-bottom: 1.02rem;}
 .app-shop-padding-bottom{margin-bottom: 1.5rem;}
-.logo{width: 2.2rem;height: 2.2rem;margin: 1rem auto;background: url(../img/logo.png) no-repeat;background-size: 100% 100%;border-radius: .2rem;}
+.logo{width: 2.2rem;height: 2.2rem;margin: 1rem auto;background: url(../img/common/logo.png) no-repeat;background-size: 100% 100%;border-radius: .2rem;}
 .app-prompt{width: 100%;overflow: hidden;font-size: .32rem;line-height: .42rem;color: #999;text-align:justify;}
 .no-more-box{width: 100%;height: .8rem;background-color:#f8f8f8;font-size: .26rem;color:#666;line-height: .8rem;text-align: center;}
 .upload-img-box{width: 1.9rem;height: 1.9rem;float: left;position: relative;}
@@ -48,6 +48,7 @@ body,html{background:#fff;}
 .icon-storage-room{background-image: url(../img/mobile/payment/icon-storage-room.png);}
 .icon-rent{background-image: url(../img/mobile/payment/icon-rent.png);}
 .icon-heating{background-image: url(../img/mobile/payment/icon-heating.png);}
+.icon-other{background-image: url(../img/mobile/payment/icon-other.png);}
 .icon-shop-info-back{background-image: url(../img/mobile/shop/icon-shop-info-back.png);}
 .icon-shop-info-share{background-image: url(../img/mobile/shop/icon-shop-info-share.png);}
 .icon-wx{background-image: url(../img/mobile/payment/icon-wx.png);}

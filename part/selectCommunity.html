@@ -10,34 +10,42 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="select-community VDOM" v-cloak>
-			<div class="select-community-sreach-box">
-				<div class="select-community-sreach-input-box">
-					<input type="" name="" id="name" value="" placeholder="请输入小区名称" />
-				</div>
-				<div class="select-community-sreach-btn" onclick="sreach();">查询</div>
-			</div>
-			<div class="page" v-if="dataList.length > 0">此账号下拥有{{count}}个小区，请妥善操作</div>
-			<div class="community-box">
-				<div class="icon before" onclick="beforePage();"></div>
-				<div class="icon next" onclick="nextPage();"></div>
-				<div v-if="dataList.length == 0" class="community-no-data-box">您还没有小区呦</div>
-				<div v-else class="community-list" v-for="t in dataList" v-on:click="selectCommunity(t)">
-					<div class="community-coverImage">
-						<img src="../img/logo.png" alt="../img/logo.png" />
+		<div class="select-community-box VDOM" v-cloak>
+			<div class="select-community-inner-box">
+				<div class="select-community-title">邻客社区平台</div>
+				<div class="select-community-sreach-box">
+					<div class="select-community-sreach-input-box">
+						<input type="" name="" id="name" value="" placeholder="请输入小区名称" />
 					</div>
-					<div class="community-name">{{t.name}}</div>
+					<div class="select-community-sreach-btn" onclick="sreach();"></div>
+				</div>
+				<div class="community-number">共{{count}}个小区，请妥善操作</div>
+				<div class="community-list-box">
+					<div v-bind:class="['icon', 'icon-left',currentPage == 1?'icon-disabled-left':'']" v-bind:onclick="currentPage == 1?'':'beforePage();'"></div>
+					<div v-bind:class="['icon', 'icon-right',currentPage == totalPage?'icon-disabled-right':'']" v-bind:onclick="currentPage == totalPage?'':'nextPage();'"></div>
+					<div class="community-list-inner-box">
+						<div v-if="dataList.length == 0" class="community-no-data-box">未搜索到相关社区哦</div>
+						<div v-else class="community-list" v-for="t in dataList" v-on:click="selectCommunity(t)">
+							<div class="img-box"></div>
+							<div class="community-name">{{t.name}}</div>
+						</div>
+					</div>
+					<div class="pagination-box" v-if="totalPage > 1">
+						<ul class="pagination-inner-box">
+							<li v-for="(t,i) in totalPage" v-bind:class="i+1 == currentPage?'selected':''" v-on:click="clickJumpPage(i+1);"></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -54,7 +62,7 @@
 		function loadData() {
 			var param = {
 				page: page,
-				pageSize: "8",
+				pageSize: "5",
 				name: $("#name").val()
 			};
 			request('POST', '/property/community/queryList.do', param, true, function(res) {

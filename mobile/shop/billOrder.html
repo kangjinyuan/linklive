@@ -15,7 +15,7 @@
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../../css/reset.css" />
 		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
 		<script src="../../js/jquery-1.9.1.min.js"></script>
@@ -48,7 +48,7 @@
 					<div class="list" v-for="sku in order.skuList">
 						<div class="list-con">
 							<div class="pay-shop-img">
-								<img v-bind:src="sku.skuInfo.image" onerror="this.src='../../img/no-img.png'" />
+								<img v-bind:src="sku.skuInfo.image" onerror="this.src='../../img/common/no-img.png'" />
 							</div>
 							<div class="pay-shop-info">
 								<div class="pay-shop-title">{{sku.skuInfo.commodityName}}</div>

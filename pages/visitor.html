@@ -10,91 +10,96 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
 		<link rel="stylesheet" href="../layui/css/layui.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">访客管理</div>
-			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">访客姓名：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="" placeholder="输入业主姓名" />
-						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">门牌号：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="" placeholder="输入门牌号" />
-						</div>
-					</div>
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					访客管理
 				</div>
-				<div class="search-time">
-					<div class="search">
-						<div class="search-name">到访时间：</div>
-						<div class="search-value-box">
-							<div class="search-value"><input type="text" name="" value="" id="cs" /></div>
-							<div class="time-cut">至</div>
-							<div class="search-value"><input type="text" name="" value="" id="ce" /></div>
+			</div>
+			<div class="search-box">
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">访客姓名：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="" placeholder="输入业主姓名" />
+							</div>
+						</div>
+						<div class="search">
+							<div class="search-name">门牌号：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="" placeholder="输入门牌号" />
+							</div>
+						</div>
+					</div>
+					<div class="search-time">
+						<div class="search">
+							<div class="search-name">到访时间：</div>
+							<div class="search-value-box">
+								<div class="search-value"><input type="text" name="" value="" id="cs" /></div>
+								<div class="time-cut">至</div>
+								<div class="search-value"><input type="text" name="" value="" id="ce" /></div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<div class="btn icon icon-chart" onclick="showfk();">访客统计表</div>
-			</div>
-			<div class="kjy-data-box">
-				<div class="kjy-table">
-					<table>
-						<thead>
-							<tr>
-								<th>序号</th>
-								<th>访客姓名</th>
-								<th>手机号</th>
-								<th>到访时间</th>
-								<th>访问地址</th>
-								<th>创建时间</th>
-							</tr>
-						</thead>
-
-						<tbody id="tbody">
-							<tr>
-								<td>1</td>
-								<td>康津源</td>
-								<td>15932119504</td>
-								<td>2018-7-11至2018-8-11</td>
-								<td>东方红城市建设集团1-1-101</td>
-								<td>2018-7-11</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<div class="btn icon icon-white-statistics" onclick="showfk();">访客统计表</div>
 				</div>
+			</div>
+			<div class="kjy-table">
+				<table>
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>访客姓名</th>
+							<th>手机号</th>
+							<th>到访时间</th>
+							<th>访问地址</th>
+							<th>创建时间</th>
+						</tr>
+					</thead>
+
+					<tbody id="tbody">
+						<tr>
+							<td>1</td>
+							<td>康津源</td>
+							<td>15932119504</td>
+							<td>2018-7-11至2018-8-11</td>
+							<td>东方红城市建设集团1-1-101</td>
+							<td>2018-7-11</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="page-box"></div>
 		</div>
 	</body>
 	<script>
-		$(function() {
-			setTime('#cs');
-			setTime('#ce');
-		})
-		loadPage();
-
 		function showfk() {
 			openMask('', "../part/visitorChart", '访客统计表', "800px", "460px", function(layerDom, layerIframe) {})
 		}
+
+		loadPage(0, function() {
+			setTime('#cs');
+			setTime('#ce');
+		});
 	</script>
 
 </html>

@@ -1,17 +1,45 @@
+var windowWidth, windowHeight;
 $(function() {
-	var WH = $(window).height();
-	$(".main").height(WH - 40);
-	$(".rightCon").height(WH - 100);
-	$("#rightIframe").height(WH - 140);
 	param.communityName = "";
-	param.serviceList = [];
-	param.serviceIndex = 0;
 	param.timestamp = "";
-	param.username = accountInfo.name;
+	param.currentTime = "";
+	param.accountName = accountInfo.name;
+	param.menuSwitch = true;
 	loadVue(param);
 	loadData();
-	loadTime($(".icon-time"));
+	loadTime();
+	resetSize();
 })
+
+window.onresize = function() {
+	resetSize();
+}
+
+function resetSize() {
+	windowWidth = $(document).width();
+	windowHeight = $(document).height();
+	var menuSwitch = setData.menuSwitch;
+	if(menuSwitch) {
+		$(".kjy-left-box").width(250);
+		$(".kjy-right-box").width(windowWidth - 250);
+	} else {
+		$(".kjy-left-box").width(80);
+		$(".kjy-right-box").width(windowWidth - 80);
+	}
+	$(".layui-tab-content").height(windowHeight - 100);
+	$(".nav-box").height(windowHeight - 80);
+}
+
+function closeAllNav() {
+	$(".layui-nav-tree li").removeClass("layui-nav-itemed");
+	$("layui-nav-tree .layui-nav-child").hide();
+}
+
+function showChildMenu(event) {
+	var ev = event.currentTarget;
+	closeAllNav();
+	$(ev).siblings("a").eq(0).click();
+}
 
 //切换小区
 function changeCommunity() {
@@ -37,83 +65,41 @@ function loadData() {
 		});
 	} else {
 		getService(function(res) {
-			var serviceList = res;
+			var dataList = res;
 			var privillege = accountInfo.privillege;
-			for(var i = 0; i < serviceList.length; i++) {
-				serviceList[i].csub = [];
+			for(var i = 0; i < dataList.length; i++) {
+				dataList[i].csub = [];
 				for(var j = 0; j < privillege.length; j++) {
-					if(serviceList[i].id == privillege[j].serviceType) {
-						serviceList[i].csub.push(privillege[j]);
+					if(dataList[i].id == privillege[j].serviceType) {
+						dataList[i].csub.push(privillege[j]);
 					}
 				}
 			}
-			setData.serviceList = serviceList;
+			setData.dataList = dataList;
 			setData.communityName = communityInfo.name;
 			setData.timestamp = timestamp;
-			resetDataList();
+			nextTick(function() {
+				setnav();
+			})
 		});
 	}
 }
 
-function resetDataList() {
-	var serviceList = setData.serviceList;
-	var serviceIndex = setData.serviceIndex;
-	setData.dataList = serviceList[serviceIndex].csub;
-	nextTick(function() {
-		setnav();
-		$(".layui-nav").find("dd").removeClass("layui-this");
-		$(".layui-nav").find("li").addClass("layui-nav-itemed");
-	})
-}
-
-function tabService(index) {
-	setData.serviceIndex = index;
-	resetDataList();
-}
-
 //加载当前时间
-function loadTime(dom) {
+function loadTime() {
 	var loadTime = setInterval(function() {
 		var checkI = judeToken();
 		if(checkI == true) {
 			var date = new Date();
-			dom.text(resetTime(date, 0));
+			setData.currentTime = resetTime(date, 0);
 		}
 	}, 1000);
 }
 
-function showMenu() {
-	if($(".mainLeft").hasClass("hide-box") == true) {
-		$(".mainLeft").removeClass("hide-box");
-	} else {
-		$(".mainLeft").addClass("hide-box");
-	}
-}
-
 //关闭展开菜单
 function menuSwitch(t) {
-	if($(t).text() == "收起菜单") {
-		$(t).addClass("icon-right").removeClass("icon-left");
-		$(t).text("展开菜单");
-		$(".mainRight").animate({
-			width: '100%'
-		}, 200);
-		$(".mainLeft").css({
-			'position': 'absolute',
-			'zIndex': '9999'
-		}).addClass("hide-box").removeClass("f_l");
-		$(".icon-menu").removeClass("hide-box");
-	} else {
-		$(t).addClass("icon-left").removeClass("icon-right");
-		$(t).text("收起菜单");
-		$(".mainRight").animate({
-			width: '85%'
-		}, 100, function() {
-			$(".mainLeft").css({
-				'position': 'relative',
-				'zIndex': '0'
-			}).removeClass("hide-box").addClass("f_l");
-			$(".icon-menu").addClass("hide-box");
-		});
-	}
+	var menuSwitch = setData.menuSwitch;
+	setData.menuSwitch = !menuSwitch;
+	closeAllNav();
+	resetSize();
 }

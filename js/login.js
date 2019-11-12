@@ -1,17 +1,4 @@
-$(function() {
-	//确定按钮点击登录
-	$("#login_btn").click(function() {
-		login();
-	});
-})
-
-//键盘enter键敲击登录
-window.onkeydown = function(ev) {
-	var ev = ev || window.event;
-	if(ev.keyCode == 13) {
-		login();
-	};
-}
+var code;
 
 //验证码登录
 function createCode() {
@@ -27,25 +14,35 @@ function createCode() {
 		createCode();
 	}
 	checkCode.innerHTML = code;
-	$("#validate").val("");
 }
 
-var code; //在全局 定义验证码
+window.onkeydown = function(ev) {
+	var ev = ev || window.event;
+	if(ev.keyCode == 13) {
+		if($("#login_btn").attr("onclick")) {
+			login();
+		}
+	};
+}
+
+function bindLoginBtn() {
+	if($("#account").val() == "" || $("#password").val() == "" || $("#inputCode").val() == "") {
+		$("#login_btn").removeClass("login-abled-btn").attr("onclick", "");
+	} else {
+		$("#login_btn").addClass("login-abled-btn").attr("onclick", "login();");
+	}
+}
+
 //登录方法
 function login() {
 	var timestamp = new Date().getTime();
-	var inputCode = $("#validate").val().toUpperCase();
-	if(inputCode.length <= 0) {
-		layer.msg("请输入验证码！");
-		return false;
-	}
+	var inputCode = $("#inputCode").val().toUpperCase();
 	if(inputCode != code) {
 		layer.msg("验证码输入错误！");
-		createCode();
 		return false;
 	}
 	var param = {
-		account: $('#username').val(),
+		account: $('#account').val(),
 		password: $("#password").val()
 	}
 	request('POST', '/account/administrator/login.do', param, true, function(res) {
@@ -82,7 +79,7 @@ function login() {
 		}
 		res.data.privillege = p;
 		if(accountInfo) {
-			if($('#username').val() != accountInfo.account || host != localHost) {
+			if($('#account').val() != accountInfo.account || host != localHost) {
 				window.localStorage.setItem("communityInfo", "");
 			}
 		}

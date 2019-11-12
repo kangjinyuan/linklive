@@ -10,39 +10,47 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
 		<link rel="stylesheet" href="../layui/css/layui.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../js/hls.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">视频监控</div>
+		<div class="kjy-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					视频监控
+				</div>
+			</div>
 			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">监控点位：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="name" placeholder="输入监控点位名称" />
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">监控点位：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="name" placeholder="输入监控点位名称" />
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<div class="btn icon icon-add" onclick="showVideoMaster(0,'','新建监控');">新建监控</div>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<div class="btn icon icon-add" onclick="showVideoMaster(0,'','新建监控');">新建监控</div>
+				</div>
 			</div>
 			<div class="kjy-data-box">
-				<div class="full-box" v-if="dataList.length == 0">
-					<div class="no-data-box">
+				<div class="no-data-box" v-if="dataList.length == 0">
+					<div class="no-data-inner-box">
 						<div class="icon icon-no-data"></div>
 						<div class="no-data-text">暂时没有监控设备哦</div>
 					</div>
@@ -84,7 +92,6 @@
 	</body>
 	<script>
 		param.channelCount = 0;
-		loadPage();
 
 		function videoOpera(flag, ev, obj) {
 			var ev = event.currentTarget;
@@ -97,7 +104,7 @@
 				} else if(obj.record == -1) {
 					var requestUrl = "/api/v1/stoprecord";
 				}
-				easyNvrRequest("GET", requestUrl, param, true, function(res) {
+				hikRequest("GET", requestUrl, param, true, function(res) {
 					if(obj.record == 0) {
 						layer.msg("录像已开始");
 					} else if(obj.record == -1) {
@@ -112,7 +119,7 @@
 					judeEdit(0, layerDom);
 				})
 			} else if(flag == 2) {
-				var imageUrl = easyNvrUrl + "/api/v1/getsnap?channel=" + obj.channel;
+				var imageUrl = hikApiUrl + "/api/v1/getsnap?channel=" + obj.channel;
 				window.top.open(imageUrl);
 			} else if(flag == 3) {
 				var videoDirectionBox = $(ev).parent().siblings(".video-direction-box");
@@ -126,7 +133,7 @@
 					channel: obj.channel,
 					command: $(ev).attr("data-command")
 				}
-				easyNvrRequest("GET", "/api/v1/ptzcontrol", param, true, function(res) {
+				hikRequest("GET", "/api/v1/ptzcontrol", param, true, function(res) {
 					layer.msg("操作成功");
 				}, function(res) {
 					layer.msg("操作失败");
@@ -168,30 +175,30 @@
 			request("POST", "/facility/surveillance/queryList.do", param, true, function(res) {
 				var dataList = res.data;
 				var videoList = [{
-					id: "1",
-					videoUrl: "/hls/channel1.m3u8"
-				}, {
 					id: "2",
-					videoUrl: "/hls/channel2.m3u8"
+					videoUrl: "/openUrl/IbmDboY/live.m3u8"
 				}, {
 					id: "3",
-					videoUrl: "/hls2/channel1.m3u8"
+					videoUrl: "/openUrl/xC1F1E4/live.m3u8"
 				}, {
 					id: "4",
-					videoUrl: "/hls2/channel2.m3u8"
+					videoUrl: "/openUrl/GoOIOFa/live.m3u8"
+				}, {
+					id: "5",
+					videoUrl: "/openUrl/vlzle8M/live.m3u8"
 				}];
 				for(var i = 0; i < dataList.length; i++) {
 					dataList[i].channel = i + 1;
 					dataList[i].online = "1";
 					dataList[i].onlineText = "在线";
 					dataList[i].record = "0";
-					dataList[i].videoUrl = easyNvrUrl + videoList[i].url;
+					dataList[i].videoUrl = hikVideoUrl + videoList[i].videoUrl;
 				}
 				setData.dataList = dataList;
 				nextTick(function() {
 					if(Hls.isSupported()) {
 						for(var i = 0; i < dataList.length; i++) {
-							var video = $("#video" + dataList[i].id);
+							var video = $("#video" + dataList[i].id).get(0);
 							var hls = new Hls();
 							hls.loadSource(dataList[i].videoUrl);
 							hls.attachMedia(video);
@@ -205,7 +212,10 @@
 				layer.msg("监控设备加载失败");
 			});
 		}
-		loadData();
+
+		loadPage(0, function() {
+			loadData();
+		});
 	</script>
 
 </html>

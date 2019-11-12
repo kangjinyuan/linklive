@@ -10,21 +10,27 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">视频设备管理</div>
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					视频设备管理
+				</div>
+			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+				</div>
 			</div>
 			<div class="kjy-table">
 				<table>
@@ -59,8 +65,6 @@
 		</div>
 	</body>
 	<script>
-		loadPage();
-
 		//		加载数据
 		function loadData() {
 			var param = {
@@ -85,7 +89,10 @@
 				layer.msg("视频设备加载失败");
 			})
 		}
-		loadData();
+
+		loadPage(0, function() {
+			loadData();
+		});
 	</script>
 
 </html>

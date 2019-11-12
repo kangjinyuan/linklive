@@ -10,73 +10,74 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
 		<div class="main-mask VDOM" v-cloak>
 			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">员工姓名：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="name" placeholder="输入员工姓名" />
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">员工姓名：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="name" placeholder="输入员工姓名" />
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">性别：</div>
-						<div class="search-value">
-							<select name="" id="gender" onchange="sreach(1);">
-								<option value="">==请选择性别==</option>
-								<option value="0">男</option>
-								<option value="1">女</option>
-							</select>
+						<div class="search">
+							<div class="search-name">性别：</div>
+							<div class="search-value">
+								<select name="" id="gender" onchange="sreach(1);">
+									<option value="">==请选择性别==</option>
+									<option value="0">男</option>
+									<option value="1">女</option>
+								</select>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+				</div>
 			</div>
-			<div class="kjy-data-box">
-				<div class="full-box" v-if="dataList.length == 0">
-					<div class="no-data-box">
-						<div class="icon icon-no-data"></div>
-						<div class="no-data-text">暂时没有员工哦</div>
-					</div>
+			<div class="no-data-box" v-if="dataList.length == 0">
+				<div class="no-data-inner-box">
+					<div class="icon icon-no-data"></div>
+					<div class="no-data-text">暂时没有员工哦</div>
 				</div>
-				<div class="kjy-table" v-else>
-					<table>
-						<thead>
-							<th class="padding20">序号</th>
-							<th>员工姓名</th>
-							<th>性别</th>
-							<th>手机号</th>
-						</thead>
-						<tbody>
-							<tr v-for="(t,i) in dataList" v-on:click="tabData(t)">
-								<td class="padding20">
-									<div v-bind:class="['radio-no-check',t.isActive?'radio-checked':'']"></div>{{((currentPage-1)*20)+(i+1)}}</td>
-								<td>{{t.name}}</td>
-								<td>{{t.genderText}}</td>
-								<td>{{t.telephone}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+			</div>
+			<div class="kjy-table" v-else>
+				<table>
+					<thead>
+						<th class="padding20">序号</th>
+						<th>员工姓名</th>
+						<th>性别</th>
+						<th>手机号</th>
+					</thead>
+					<tbody>
+						<tr v-for="(t,i) in dataList" v-on:click="tabData(t)">
+							<td class="padding20">
+								<div v-bind:class="['radio-no-check',t.isActive?'radio-checked':'']"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+							<td>{{t.name}}</td>
+							<td>{{t.genderText}}</td>
+							<td>{{t.telephone}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="page-box"></div>
 		</div>
 	</body>
 	<script>
-		loadSmallPage();
 
 		//确定上一级页面参数
 		function setParentData() {

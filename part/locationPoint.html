@@ -10,14 +10,15 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
-		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.ToolBar"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797"></script>
+		<!--<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.ToolBar"></script>-->
 		<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 	</head>
 
@@ -50,7 +51,7 @@
 					</div>
 				</div>
 				<div class="mask-list">
-					<div class="mask-list-name"><span>*</span><span class="text">NFC编码</span>：</div>
+					<div class="mask-list-name"><span class="text">NFC编码</span>：</div>
 					<div class="mask-list-value">
 						<input type="text" name="" id="nfcTag" value="" />
 					</div>
@@ -61,7 +62,9 @@
 						<textarea name="" rows="" cols="" id="remark" class="layer-edit-box"></textarea>
 					</div>
 				</div>
-				<div class="kjy-data-box" id="mapBox"></div>
+				<div class="kjy-data-box">
+					<div class="map-box" id="mapBox"></div>
+				</div>
 			</div>
 			<div class="mask-btn-box">
 				<div class="btn-box">
@@ -94,11 +97,23 @@
 		}
 
 		function setMap(parentData, callback) {
+			var map = new AMap.Map('mapBox', {
+				zoom: 20,
+				resizeEnable: true,
+				center: [parentData.longitude, parentData.latitude]
+			})
+
+			AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.MapType', 'AMap.Geolocation'], function() {
+				var toolbar = new AMap.ToolBar();
+				map.addControl(toolbar);
+				var Scale = new AMap.Scale();
+				map.addControl(Scale);
+				var MapType = new AMap.MapType();
+				map.addControl(MapType);
+				var Geolocation = new AMap.Geolocation();
+				map.addControl(Geolocation);
+			});
 			AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
-				var map = new AMap.Map('mapBox', {
-					zoom: 18,
-					center: [parentData.longitude, parentData.latitude]
-				})
 				var positionPicker = new PositionPicker({
 					mode: 'dragMarker',
 					map: map

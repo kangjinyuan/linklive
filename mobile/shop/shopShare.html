@@ -15,7 +15,7 @@
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../../css/reset.css" />
 		<link rel="stylesheet" href="../../css/swiper.min.css" />
 		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
@@ -37,7 +37,7 @@
 				<div class="swiper-container">
 					<ul class="swiper-wrapper">
 						<li v-for="t in commodityInfo.bannerList" class="swiper-slide">
-							<a><img v-bind:src="t" onerror="this.src='../../img/no-img.png'" /></a>
+							<a><img v-bind:src="t" onerror="this.src='../../img/common/no-img.png'" /></a>
 						</li>
 					</ul>
 					<!-- 分页器 -->
@@ -86,7 +86,7 @@
 						</div>
 					</div>
 					<div class="shop-introduce">
-						<img v-for="t in commodityInfo.detailList" v-bind:src="t" onerror="this.src='../../img/no-img.png'" />
+						<img v-for="t in commodityInfo.detailList" v-bind:src="t" onerror="this.src='../../img/common/no-img.png'" />
 					</div>
 				</div>
 			</div>

@@ -25,6 +25,19 @@ var regular_roomAddress = /^[0-9-]{7,11}$/;
 //	code正则表达式
 var regular_code = /^[A-Za-z0-9]*$/;
 
+$(function() {
+	if($(".kjy-box").hasClass("kjy-flex-box")) {
+		var searchTextChild = $(".search-text").find(".search");
+		var searchTextChildHeight = searchTextChild.outerHeight(true);
+		var searchTimeChild = $(".search-time").find(".search");
+		var searchTimeChildHeight = searchTimeChild.outerHeight(true);
+		var searchTextChildRow = Math.ceil(searchTextChild.length / 4);
+		var searchTimeChildRow = Math.ceil(searchTimeChild.length / 3);
+		$(".search-text").height(searchTextChildRow * searchTextChildHeight);
+		$(".search-time").height(searchTimeChildRow * searchTimeChildHeight);
+	}
+})
+
 //刷新页面
 function reloadPage() {
 	window.location.reload();
@@ -258,7 +271,15 @@ function request(method, requestUrl, param, showLoading, okCallback, noCallback)
 	});
 }
 
-function easyNvrRequest(method, requestUrl, param, showLoading, okCallback, noCallback) {
+function hikRequest(method, requestUrl, param, showLoading, okCallback, noCallback) {
+	if(param.pageNo) {
+		var isPage = true;
+	} else {
+		var isPage = false;
+	}
+	if(method == "POST") {
+		param = JSON.stringify(param);
+	}
 	var timestamp = new Date().getTime();
 	if(showLoading == true) {
 		var loadding = layer.load(1, {
@@ -268,21 +289,30 @@ function easyNvrRequest(method, requestUrl, param, showLoading, okCallback, noCa
 	}
 	$.ajax({
 		type: method,
-		url: easyNvrUrl + requestUrl + "?timestamp=" + timestamp,
+		url: requestUrl + "?timestamp=" + timestamp,
 		contentType: "application/json;charset=UTF-8",
 		data: param,
 		dataType: 'json',
 		success: function(res) {
-			var header = res.EasyDarwin.Header;
-			var body = res.EasyDarwin.Body;
-			if(header.ErrorNum == "200") {
-				okCallback(body);
-			} else if(header.ErrorNum == "400") {
-				layer.msg("该设备不支持此操作");
+			if(res.code == "0") {
+				okCallback(res);
 			} else {
-				noCallback(header);
+				noCallback(res);
 			}
-			layer.closeAll('loading');
+			if(isPage == true) {
+				idList = [];
+				var dataInfo = res.data;
+				setData.dataLength = dataInfo.list.length;
+				if(dataInfo.totalPage) {
+					setData.totalPage = dataInfo.totalPage;
+				}
+				setData.pageSize = dataInfo.pageSize;
+				setData.currentPage = dataInfo.pageNo;
+				setData.count = dataInfo.total;
+			}
+			if(showLoading == true) {
+				layer.closeAll('loading');
+			}
 		},
 		error: function(res) {
 			if(res.status == '401' || res.status == '402' || res.status == '403' || res.status == '404' || res.status == '405' || res.status == '407' || res.status == '413' || res.status == '414' || res.status == '415' || res.status == '500' || res.status == '502' || res.status == '503' || res.status == '504' || res.status == '505') {
@@ -292,12 +322,12 @@ function easyNvrRequest(method, requestUrl, param, showLoading, okCallback, noCa
 	});
 }
 
-function easyNvrLogin(callback) {
+function hikLogin(callback) {
 	var param = {
 		username: "admin",
 		password: $.md5("admin")
 	}
-	easyNvrRequest("GET", "/api/v1/login", param, true, function(res) {
+	hikRequest("GET", "/api/v1/login", param, true, function(res) {
 		callback();
 	}, function(res) {
 		layer.msg("获取外网token失败");
@@ -319,17 +349,13 @@ function loadPart(url, dom, callback) {
 	});
 }
 
-function loadPage(callback) {
-	loadPart("../part/page", ".page-box", function(res) {
-		loadVue(param);
-		if(callback) {
-			callback();
-		}
-	})
-}
-
-function loadSmallPage(callback) {
-	loadPart("../part/smallPage", ".page-box", function(res) {
+function loadPage(type, callback) {
+	if(type == 0) {
+		var pageUrl = "../part/page";
+	} else if(type == 1) {
+		var pageUrl = "../part/smallPage";
+	}
+	loadPart(pageUrl, ".page-box", function(res) {
 		loadVue(param);
 		if(callback) {
 			callback();
@@ -353,7 +379,7 @@ function judeEdit(flag, layerDom) {
 //打开操作记录
 function openLog(logType, title) {
 	openMask(logType, "../pages/logMag", title, "100%", "100%", function(layerDom, layerIframe) {
-		layerDom.find(".KJY_title").hide();
+		layerDom.find(".kjy-title-box").hide();
 	})
 }
 
@@ -431,6 +457,8 @@ function tabData(obj) {
 	}
 	if(window.setParentData) {
 		setParentData();
+	} else if(window.setOwnData) {
+		setOwnData();
 	}
 }
 
@@ -624,6 +652,16 @@ function jumpPage() {
 	}
 }
 
+//点击轮播点跳转页面
+function clickJumpPage(pageNumber) {
+	page = pageNumber;
+	if(setData.parentData) {
+		loadData(setData.parentData);
+	} else {
+		loadData();
+	}
+}
+
 //时间控件
 function setTime(dom, type) {
 	layui.use('laydate', function() {
@@ -719,10 +757,10 @@ function tabPage(id) {
 	var li = $("#rightNav", top.document).find("li");
 	var aids = [];
 	for(var i = 0; i < a.length; i++) {
-		var aid = a[i].id;
+		var aid = a.eq(i).attr("data-id");
 		aids.push(aid);
 	}
-	if(aids.indexOf(id) == -1) {
+	if($.inArray(id, aids) == -1) {
 		layer.msg("关联功能权限未打开，此功能无法操作，请联系管理员", {
 			time: 2000
 		}, function() {
@@ -730,7 +768,7 @@ function tabPage(id) {
 		});
 	} else {
 		for(var i = 0; i < a.length; i++) {
-			var aid = a[i].id;
+			var aid = a.eq(i).attr("data-id");
 			if(id == aid) {
 				a[i].click();
 			}
@@ -751,7 +789,7 @@ function getCountDays() {
 function judeImg(callback) {
 	for(var i = 0; i < $("img").length; i++) {
 		var imgDom = $("img").eq(i);
-		if(imgDom.attr("src") == "../img/no-img.png") {
+		if(imgDom.attr("src") == "../img/common/no-img.png") {
 			imgDom.attr("src", "");
 		}
 	}
@@ -837,9 +875,9 @@ function bindWindowChange(callback) {
 function getIndexArray(dataList, index, slotType) {
 	var resArray = [];
 	for(var i = 0; i < dataList.length; i++) {
-		if(slotType == true){
+		if(slotType == true) {
 			resArray.push(dataList[i][index]);
-		}else{
+		} else {
 			resArray.unshift(dataList[i][index]);
 		}
 	}
@@ -901,7 +939,7 @@ function checkInput() {
 
 	//	图片必填
 	for(var i = 0; i < $(".required-img").length; i++) {
-		if($(".required-img").eq(i).attr("src") == "" || $(".required-img").eq(i).attr("src") == "../img/no-img.png") {
+		if($(".required-img").eq(i).attr("src") == "" || $(".required-img").eq(i).attr("src") == "../img/common/no-img.png") {
 			var required = $(".required-img").eq(i).parent().parent().siblings(".mask-list-name").find(".text").text();
 			layer.msg(required + " 为必填项 请核对");
 			return false;

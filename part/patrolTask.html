@@ -10,15 +10,15 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
 		<link rel="stylesheet" href="../layui/css/layui.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
@@ -71,7 +71,7 @@
 						<div class="btn icon icon-select" onclick="selectPart(0);">选择巡更点位</div>
 					</div>
 				</div>
-				<div class="mask-list">
+				<div class="mask-list c_b">
 					<div class="mask-list-name"><span>*</span><span class="text">负责人姓名</span>：</div>
 					<div class="mask-list-value">
 						<input type="text" name="" value="" id="stuffName" disabled="disabled" class="required" />
@@ -114,7 +114,9 @@
 						patrolMode: $("#patrolMode").val(),
 						dataList: setData.dataList
 					}
-					layerIframe[0].contentWindow.loadData(parentData);
+					layerIframe[0].contentWindow.loadPage(1, function() {
+						layerIframe[0].contentWindow.loadData(parentData);
+					});
 				})
 			} else if(flag == 1) {
 				openMask('', "selectStuff", "选择负责人", "98%", "98%", function(layerDom, layerIframe) {
@@ -122,7 +124,9 @@
 						stuffName: "stuffName",
 						stuffId: "stuffId"
 					}
-					layerIframe[0].contentWindow.loadData(parentData);
+					layerIframe[0].contentWindow.loadPage(1, function() {
+						layerIframe[0].contentWindow.loadData(parentData);
+					});
 				})
 			}
 		}
@@ -137,10 +141,10 @@
 					layer.msg("请选择巡更点位");
 					return false;
 				}
-				if(locationPointJson.length > 10) {
-					layer.msg("巡更点位不能超过10个");
-					return false;
-				}
+//				if(locationPointJson.length > 10) {
+//					layer.msg("巡更点位不能超过10个");
+//					return false;
+//				}
 				var param = {
 					id: $(".main-mask").attr("data-id"),
 					name: $("#name").val(),

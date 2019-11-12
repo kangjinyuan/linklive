@@ -10,158 +10,164 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
 		<link rel="stylesheet" href="../layui/css/layui.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<link rel="stylesheet" href="../layui/css/layui.css" />
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
 			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">缴费项目：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="feeName" placeholder="输入缴费项目" />
-						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">缴费状态：</div>
-						<div class="search-value">
-							<select name="" id="state" onchange="sreach();">
-								<option value="">==请选择缴费状态</option>
-								<option value="1">已缴费</option>
-								<option value="0">未缴费</option>
-							</select>
-						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">支付方式：</div>
-						<div class="search-value">
-							<select name="" id="payPlatform" onchange="sreach();">
-								<option value="">==请选择缴费状态</option>
-								<option value="Cash">现金支付</option>
-								<option value="ceb">线上支付</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="search-time">
-					<div class="search">
-						<div class="search-name">支付时间：</div>
-						<div class="search-value-box">
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">账单编号：</div>
 							<div class="search-value">
-								<input type="text" name="" value="" id="startTime" />
+								<input type="text" name="" value="" id="id" placeholder="输入账单编号" />
 							</div>
-							<div class="time-cut">至</div>
+						</div>
+						<div class="search">
+							<div class="search-name">缴费项目：</div>
 							<div class="search-value">
-								<input type="text" name="" value="" id="endTime" />
+								<input type="text" name="" value="" id="feeName" placeholder="输入缴费项目" />
+							</div>
+						</div>
+						<div class="search">
+							<div class="search-name">缴费状态：</div>
+							<div class="search-value">
+								<select name="" id="state" onchange="sreach();">
+									<option value="">==请选择缴费状态</option>
+									<option value="1">已缴费</option>
+									<option value="0">未缴费</option>
+								</select>
+							</div>
+						</div>
+						<div class="search">
+							<div class="search-name">支付方式：</div>
+							<div class="search-value">
+								<select name="" id="payPlatform" onchange="sreach();">
+									<option value="">==请选择缴费状态</option>
+									<option value="Cash">现金支付</option>
+									<option value="ceb">线上支付</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="search-time">
+						<div class="search">
+							<div class="search-name">支付时间：</div>
+							<div class="search-value-box">
+								<div class="search-value">
+									<input type="text" name="" value="" id="startTime" />
+								</div>
+								<div class="time-cut">至</div>
+								<div class="search-value">
+									<input type="text" name="" value="" id="endTime" />
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<div v-if="feeList.length > 0" class="btn icon icon-add" onclick="addRow();">新建账单</div>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<div v-if="feeList.length > 0" class="btn icon icon-add" onclick="addRow();">新建账单</div>
+				</div>
 			</div>
-			<div class="kjy-data-box">
-				<div class="full-box" v-if="dataList.length == 0">
-					<div class="no-data-box">
-						<div class="icon icon-no-data"></div>
-						<div class="no-data-text">暂时没有房屋账单哦</div>
-					</div>
+			<div class="no-data-box" v-if="dataList.length == 0">
+				<div class="no-data-inner-box">
+					<div class="icon icon-no-data"></div>
+					<div class="no-data-text">暂时没有房屋账单哦</div>
 				</div>
-				<div class="kjy-table" v-else>
-					<table>
-						<thead>
-							<tr>
-								<th>序号</th>
-								<th>账单编号</th>
-								<th>账单名称</th>
-								<th>缴费项目</th>
-								<th>缴费状态</th>
-								<th>账单截止时间</th>
-								<th>账单金额（元）</th>
-								<th>优惠金额（元）</th>
-								<th>支付方式</th>
-								<th>支付时间</th>
-								<th>创建时间</th>
-								<th>操作</th>
-							</tr>
-						</thead>
+			</div>
+			<div class="kjy-table" v-else>
+				<table>
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>账单编号</th>
+							<th>账单名称</th>
+							<th>缴费项目</th>
+							<th>缴费状态</th>
+							<th>支付方式</th>
+							<th>账单截止时间</th>
+							<th>账单金额（元）</th>
+							<th>优惠金额（元）</th>
+							<th>支付时间</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
 
-						<tbody id="tbody">
-							<tr v-for="(t,i) in dataList">
-								<td v-if="totalPage == 0">{{i+1}}</td>
-								<td v-else>{{((currentPage-1)*20)+(i+1)}}</td>
-								<td>{{t.id?t.id:'暂无账单编号'}}</td>
-								<td v-if="t.scheduleName">
-									{{t.scheduleName}}
-								</td>
-								<td v-else>
-									<p v-if="t.remark">{{t.remark}}</p>
-									<input v-else type="text" name="" v-bind:value="t.remark" placeholder="填写账单名称" class="remark" />
-								</td>
-								<td>
-									<p v-if="t.feeId">{{t.feeName}}</p>
-									<select v-else name="" class="feeId">
-										<option value="">==请选择缴费项目==</option>
-										<option v-for="t in feeList" v-bind:value="t.id">{{t.feeName}}</option>
+					<tbody id="tbody">
+						<tr v-for="(t,i) in dataList">
+							<td v-if="totalPage == 0">{{i+1}}</td>
+							<td v-else>{{((currentPage-1)*20)+(i+1)}}</td>
+							<td>{{t.id?t.id:'暂无账单编号'}}</td>
+							<td v-if="t.scheduleName">
+								{{t.scheduleName}}
+							</td>
+							<td v-else>
+								<p v-if="t.remark">{{t.remark}}</p>
+								<input v-else type="text" name="" v-bind:value="t.remark" placeholder="填写账单名称" class="remark" />
+							</td>
+							<td>
+								<p v-if="t.feeId">{{t.feeName}}</p>
+								<select v-else name="" class="feeId">
+									<option value="">==请选择缴费项目==</option>
+									<option v-for="t in feeList" v-bind:value="t.id">{{t.feeName}}</option>
+								</select>
+							</td>
+							<td>{{t.state?t.stateText:'暂无缴费状态'}}</td>
+							<td>
+								<div v-if="t.state == ''">暂无支付方式</div>
+								<div v-else-if="t.state == '1'">{{t.payPlatformText}}</div>
+								<div v-else="t.state == '0'">
+									<p v-if="t.isPropertyFee">暂无支付方式</p>
+									<select v-else v-model='t.payPlatform' name="" v-on:change="offlinePay(t.id);">
+										<option value="">==请选择支付方式==</option>
+										<option value="Cash">现金支付</option>
 									</select>
-								</td>
-								<td>
-									<p v-if="t.state == ''">暂无缴费状态</p>
-									<p v-else-if="t.state == 1">已缴费</p>
-									<select v-else="t.state == 0" v-model='t.state' name="" v-on:change="changeState(t.id);">
-										<option value="">==请选择缴费状态==</option>
-										<option value="0">未缴费</option>
-										<option value="1">已缴费</option>
-									</select>
-								</td>
-								<td>
-									<p v-if="t.deadlineTime">{{t.deadlineTime | resetTime(3)}}</p>
-									<input v-else type="text" name="" value="" placeholder="填写截止时间" class="deadlineTime" />
-								</td>
-								<td>
-									<p v-if="t.fee">{{t.fee}}</p>
-									<input v-else type="text" name="" value="" placeholder="填写账单金额" class="fee" />
-								</td>
-								<td>
-									<p v-if="t.fee">{{t.discountFee}}</p>
-									<input v-else type="text" name="" value="" placeholder="填写优惠金额" class="discountFee" />
-								</td>
-								<td>{{t.payPlatform?t.payPlatformText:'暂无支付方式'}}</td>
-								<td>{{t.payTime?t.payTime:'暂无支付时间'}}</td>
-								<td>{{t.createTime?t.createTime:'暂无创建时间'}}</td>
-								<td>
-									<div v-if="t.id == ''" class="btn icon icon-save" onClick="saveBillCollection(this);">保存</div>
-									<div class="btn icon icon-del" v-on:click="del(t.id);">删除</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+								</div>
+							</td>
+							<td>
+								<p v-if="t.deadlineTime">{{t.deadlineTime | resetTime(3)}}</p>
+								<input v-else type="text" name="" value="" placeholder="填写截止时间" class="deadlineTime" />
+							</td>
+							<td>
+								<p v-if="t.fee">{{t.fee}}</p>
+								<input v-else type="text" name="" value="" placeholder="填写账单金额" class="fee" />
+							</td>
+							<td>
+								<p v-if="t.fee">{{t.discountFee}}</p>
+								<input v-else type="text" name="" value="" placeholder="填写优惠金额" class="discountFee" />
+							</td>
+							<td>{{t.payTime?t.payTime:'暂无支付时间'}}</td>
+							<td>{{t.createTime?t.createTime:'暂无创建时间'}}</td>
+							<td>
+								<div v-if="t.id == ''" class="btn icon icon-save" onClick="saveBillCollection(this);">保存</div>
+								<div class="btn icon icon-del" v-on:click="del(t.id);">删除</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="page-box"></div>
 		</div>
 	</body>
 	<script>
 		param.feeList = [];
-		loadPage(function() {
-			setTime('#startTime', "date");
-			setTime('#endTime', "date");
-		});
 
-		function changeState(id) {
+		function offlinePay(id) {
 			var param = {
 				id: id
 			}
@@ -265,7 +271,7 @@
 				id: "",
 				outTradeNo: "",
 				payPlatform: "",
-				payPlatformtext: "",
+				payPlatformText: "",
 				payer: "",
 				remark: "",
 				roomCode: roomInfo.address.split("-")[2],
@@ -273,6 +279,7 @@
 				scheduleId: "-1",
 				scheduleName: "",
 				state: "",
+				stateText: "",
 				totalFee: "",
 				transactionId: "",
 				unit: roomInfo.address.split("-")[1],
@@ -303,6 +310,7 @@
 		function loadData(roominfo) {
 			var param = {
 				page: page,
+				id: $("#id").val(),
 				feeName: $("#feeName").val(),
 				state: $("#state").val(),
 				payPlatform: $("#payPlatform").val(),
@@ -315,10 +323,21 @@
 				for(var i = 0; i < dataList.length; i++) {
 					dataList[i].fee = parseFloat(dataList[i].fee).toFixed(2);
 					dataList[i].discountFee = parseFloat(dataList[i].discountFee).toFixed(2);
-					if(!dataList[i].scheduleName) {
-						if(dataList[i].remark.indexOf("物业费") > -1) {
-							dataList[i].remark = dataList[i].remark + "个月";
+					if(dataList[i].feeName.indexOf("物业费") > -1) {
+						dataList[i].remark = dataList[i].remark + "个月";
+						dataList[i].isPropertyFee = true;
+					} else {
+						if(dataList[i].feeName.indexOf("水费") > -1) {
+							if(dataList[i].dosage) {
+								dataList[i].remark = dataList[i].remark + "（用量" + dataList[i].dosage + "吨）";
+							}
 						}
+						dataList[i].isPropertyFee = false;
+					}
+					if(dataList[i].state == 0) {
+						dataList[i].stateText = "未缴费";
+					} else if(dataList[i].state == 1) {
+						dataList[i].stateText = "已缴费";
 					}
 					if(dataList[i].payPlatform == "Cash") {
 						dataList[i].payPlatformText = "现金支付";
@@ -336,7 +355,7 @@
 
 		function loadFee() {
 			var param = {
-				pageSize: "100",
+				pageSize: "1000",
 				feeProperty: "0"
 			}
 			request('POST', '/property/fee/queryList.do', param, true, function(res) {

@@ -10,21 +10,21 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<link rel="stylesheet" href="../layui/css/layui.css" />
 		<link rel="stylesheet" href="../layui/css/modules/layer/default/layer.css" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.js"></script>
 		<script src="../layui/lay/modules/layer.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM main-mask" v-cloak>
+		<div class="kjy-box VDOM main-mask" v-cloak>
 			<form class="layui-form" action="" lay-filter="qxform">
 				<div class="layui-collapse" lay-accordion="" v-for="t in dataList" v-if="t.csub.length > 0">
 					<div class="layui-colla-item">
@@ -63,7 +63,7 @@
 				form.on('switch(qxswitch)', function(data) {
 					var tid = data.value;
 					var tchecked = this.checked;
-					var privillege = setData.privilege;
+					var privillege = setData.privillege;
 					for(var i = 0; i < privillege.length; i++) {
 						var csub = privillege[i].csub;
 						for(var j = 0; j < csub.length; j++) {
@@ -102,7 +102,6 @@
 		function loadData(privillege, account) {
 			var timestamp = new Date().getTime();
 			setData.account = account;
-			privillege = JSON.parse(privillege);
 			setData.privillege = privillege;
 			getService(function(res) {
 				var dataList = res;

@@ -10,30 +10,37 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
 		<script src="../js/echarts-all-3.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">报警统计</div>
-			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+		<div class="kjy-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					警报统计
+				</div>
 			</div>
 			<div class="kjy-opera-box">
 				<div class="opera-main-box">
 					<div class="opera-main-list-box opera-main-left-box">
 						<div class="opera-main-list-inner-box">
-							<ul class="opera-main-nav-box opera-main-video-nav-box">
-								<li v-for="t in dataList">
-									<div class="opera-main-nav-text-box">{{t.deviceName}}</div>
+							<div class="no-data-box" v-if="dataList.length == 0">
+								<div class="no-data-inner-box">
+									<div class="icon icon-no-data"></div>
+									<div class="no-data-text">暂时没有门禁设备哦</div>
+								</div>
+							</div>
+							<ul class="opera-main-nav-box" v-else>
+								<li v-for="t in dataList" v-on:click="tabData(t);">
+									<div v-bind:class="['opera-main-nav-text-box',t.isActive?'selected':'']">{{t.deviceName}}</div>
 								</li>
 							</ul>
 						</div>
@@ -54,30 +61,36 @@
 	<script>
 		loadVue(param);
 
-		var userChart = echarts.init($(".chart-list-canvas-box").get(0));
+		var doorGuardChart = echarts.init($(".chart-list-canvas-box").get(0));
 
 		function getDoorMaster() {
 			var param = {
-				pageSize: "10000"
+				pageSize: "1000"
 			}
 			request("POST", "/facility/doorMaster/queryList.do", param, true, function(res) {
-				setData.dataList = res.data;
+				var dataList = res.data;
+				for(var i = 0; i < dataList.length; i++) {
+					dataList[i].isActive = false;
+				}
+				setData.dataList = dataList;
 				nextTick(function() {
-					getDoorGuard(false);
+					if(dataList.length > 0) {
+						tabData(dataList[0]);
+					}
 				})
 			}, function(res) {
 				layer.msg("门禁设备加载失败");
 			});
 		}
 
-		function getDoorGuard(isLoading) {
+		function setOwnData() {
 			var param = {
-				deviceSn: $("#deviceSn").val()
+				deviceSn: sInfo.deviceSn
 			}
-			request('POST', '/statistics/doorGuard/record.do', param, isLoading, function(res) {
+			request('POST', '/statistics/doorGuard/record.do', param, true, function(res) {
 				var dataList = res.data;
 				var dateArray = getAppointDate(7, 0);
-				var openingNumber = getIndexArray(dataList, 0, true);
+				var openingNumber = getIndexArray(dataList, 0, false);
 				var faceOpeningNumber = getIndexArray(dataList, 2, false);
 				var visitors = getIndexArray(dataList, 3, false);
 				doorGuardChart.setOption({
@@ -202,6 +215,8 @@
 				layer.msg("通行统计加载失败");
 			})
 		}
+
+		getDoorMaster();
 	</script>
 
 </html>

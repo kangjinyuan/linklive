@@ -10,13 +10,13 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
@@ -60,10 +60,10 @@
 					<div class="btn icon icon-select" onclick="selectFee('feeValue','feeId');">选择物业费</div>
 				</div>
 				<div class="mask-list c_b">
-					<div class="mask-list-name"><span>*</span><span class="text">创建房屋</span>：</div>
+					<div class="mask-list-name"><span>*</span><span class="text">批量创建</span>：</div>
 					<div class="mask-list-value">
 						<select name="" id="auto" class="required" onchange="isAuto(this);">
-							<option value="">==请选择创建房屋==</option>
+							<option value="">==请选择批量创建==</option>
 							<option value="1">是</option>
 							<option value="0">否</option>
 						</select>
@@ -108,7 +108,9 @@
 					feeValue: "feeValue",
 					feeId: "feeId"
 				}
-				layerIframe[0].contentWindow.loadData(parentData);
+				layerIframe[0].contentWindow.loadPage(1, function() {
+					layerIframe[0].contentWindow.loadData(parentData);
+				});
 			})
 		}
 

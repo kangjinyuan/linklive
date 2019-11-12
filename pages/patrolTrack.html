@@ -10,20 +10,22 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
-		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797&plugin=AMap.ToolBar"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=bf20afe40b35aaefe32a418f194dc797"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="full-box" id="container"></div>
+		<div class="kjy-box VDOM" v-cloak>
+			<div class="full-box">
+				<div class="map-box" id="container"></div>
+			</div>
 		</div>
 	</body>
 	<script>
@@ -32,16 +34,27 @@
 		var markerList = [];
 		var map = new AMap.Map('container', {
 			zoom: 20,
+			resizeEnable: true,
 			center: [communityInfo.longitude, communityInfo.latitude]
 		})
+		AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.MapType', 'AMap.Geolocation'], function() {
+			var toolbar = new AMap.ToolBar();
+			map.addControl(toolbar);
+			var Scale = new AMap.Scale();
+			map.addControl(Scale);
+			var MapType = new AMap.MapType();
+			map.addControl(MapType);
+			var Geolocation = new AMap.Geolocation();
+			map.addControl(Geolocation);
+		});
 
 		//		加载数据
 		function loadPatrolTrack(taskId, page) {
 			var polylines = setData.polylines;
 			var param = {
 				page: page,
-				pageSize: "10000",
-				taskId: "90"
+				pageSize: "1000",
+				taskId: taskId
 			}
 			request('POST', '/property/patrolTrack/queryList.do', param, true, function(res) {
 				var dataList = res.data;

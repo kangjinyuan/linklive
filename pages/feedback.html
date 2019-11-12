@@ -10,36 +10,43 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="KJY_title">业主反馈</div>
-			<div class="searchbox">
-				<div class="search_text">
-					<div class="search">
-						<div class="searchname">反馈内容：</div>
-						<div class="searchvalue">
-							<input type="text" name="" value="" id="content" placeholder="输入反馈内容" />
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					业主反馈
+				</div>
+			</div>
+			<div class="search-box">
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">反馈内容：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="content" placeholder="输入反馈内容" />
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="btnbox">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<!--<div class="btn icon icon-del" onclick="del();">删除</div>-->
-				<!--<div class="btn icon icon-feedback" onclick="showmask();">意见反馈</div>-->
+			<div class="btn-box">
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<!--<div class="btn icon icon-del" onclick="del();">删除</div>-->
+				</div>
 			</div>
-			<div class="KJY_table">
+			<div class="kjy-table">
 				<table>
 					<thead>
 						<tr>
@@ -64,8 +71,6 @@
 		</div>
 	</body>
 	<script>
-		loadPage();
-
 		//新建或编辑
 		function showmask() {
 			openMask("", "../part/feedback", "意见反馈", "390px", "240px", function(layerDom, layerIframe) {
@@ -102,7 +107,10 @@
 				layer.msg("业主反馈加载失败");
 			})
 		}
-		loadData();
+
+		loadPage(0, function() {
+			loadData();
+		});
 	</script>
 
 </html>

@@ -15,7 +15,7 @@
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link rel="shortcut icon" href="../../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../../css/reset.css" />
 		<link rel="stylesheet" href="../../css/swiper.min.css" />
 		<link rel="stylesheet" href="../../css/app.css?v=9781d9f8c2" />
@@ -37,7 +37,7 @@
 				<div class="swiper-container">
 					<ul class="swiper-wrapper">
 						<li v-for="t in commodityInfo.bannerList" class="swiper-slide">
-							<a><img v-bind:src="t" onerror="this.src='../../img/no-img.png'" /></a>
+							<a><img v-bind:src="t" onerror="this.src='../../img/common/no-img.png'" /></a>
 						</li>
 					</ul>
 					<!-- 分页器 -->
@@ -90,7 +90,7 @@
 							<div class="comment-title">
 								<div class="user-info">
 									<div class="head-img">
-										<img v-bind:src="t.headImage" onerror="this.src='../../img/no-img.png'" />
+										<img v-bind:src="t.headImage" onerror="this.src='../../img/common/no-img.png'" />
 									</div>
 									<div class="user-name">{{t.nickName}}</div>
 								</div>
@@ -101,7 +101,7 @@
 									{{t.content}}
 								</div>
 								<div class="comment-con-img" v-if="t.imageList.length > 0">
-									<img v-for="image in t.imageList" v-bind:src="image+'?imageView2/1/w/220/h/220'" v-on:click="previewImage(image);" onerror="this.src='../../img/no-img.png'" />
+									<img v-for="image in t.imageList" v-bind:src="image+'?imageView2/1/w/220/h/220'" v-on:click="previewImage(image);" onerror="this.src='../../img/common/no-img.png'" />
 								</div>
 							</div>
 						</li>
@@ -114,7 +114,7 @@
 						</div>
 					</div>
 					<div class="shop-introduce">
-						<img v-for="t in commodityInfo.detailList" v-bind:src="t" onerror="this.src='../../img/no-img.png'" />
+						<img v-for="t in commodityInfo.detailList" v-bind:src="t" onerror="this.src='../../img/common/no-img.png'" />
 					</div>
 				</div>
 			</div>
@@ -130,7 +130,7 @@
 						<div class="list">
 							<div class="list-con">
 								<div class="shop-img">
-									<img v-bind:src="skuImage" onerror="this.src='../../img/no-img.png'" />
+									<img v-bind:src="skuImage" onerror="this.src='../../img/common/no-img.png'" />
 								</div>
 								<div class="rule-shop-info">
 									<div class="text price">￥{{skuPrice}}</div>
@@ -302,7 +302,7 @@
 		function loadSku(commodityId) {
 			var param = {
 				commodityId: commodityId,
-				pageSize: "10000"
+				pageSize: "1000"
 			}
 			request('POST', '/shop/commodity/sku/queryList.do', param, true, function(res) {
 				var dataList = res.data;

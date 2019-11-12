@@ -10,28 +10,34 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
 		<script src="../js/echarts-all-3.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">人行统计</div>
+		<div class="kjy-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					人行统计
+				</div>
+			</div>
 			<div class="kjy-opera-box">
 				<div class="opera-main-box">
 					<div class="opera-main-list-box opera-main-left-box">
 						<div class="opera-main-list-inner-box">
 							<div class="full-box" v-if="dataList.length == 0">
 								<div class="no-data-box">
-									<div class="icon icon-no-data"></div>
-									<div class="no-data-text">暂时没有门禁设备哦</div>
+									<div class="no-data-inner-box">
+										<div class="icon icon-no-data"></div>
+										<div class="no-data-text">暂时没有门禁设备哦</div>
+									</div>
 								</div>
 							</div>
 							<ul class="opera-main-nav-box" v-else>
@@ -61,7 +67,7 @@
 
 		function getDoorMaster() {
 			var param = {
-				pageSize: "10000"
+				pageSize: "1000"
 			}
 			request("POST", "/facility/doorMaster/queryList.do", param, true, function(res) {
 				var dataList = res.data;
@@ -73,14 +79,13 @@
 					if(dataList.length > 0) {
 						tabData(dataList[0]);
 					}
-					getDoorGuard();
 				})
 			}, function(res) {
 				layer.msg("门禁设备加载失败");
 			});
 		}
 
-		function getDoorGuard() {
+		function setOwnData() {
 			var param = {
 				deviceSn: sInfo.deviceSn
 			}
@@ -88,8 +93,8 @@
 				var dataList = res.data;
 				var dateArray = getAppointDate(7, 0);
 				var openingNumber = getIndexArray(dataList, 0, false);
-				var faceOpeningNumber = getIndexArray(dataList, 2, true);
-				var visitors = getIndexArray(dataList, 3, true);
+				var faceOpeningNumber = getIndexArray(dataList, 2, false);
+				var visitors = getIndexArray(dataList, 3, false);
 				doorGuardChart.setOption({
 					tooltip: {
 						trigger: 'axis',

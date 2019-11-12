@@ -10,87 +10,89 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
-			<div class="kjy-title">客服管理</div>
+		<div class="kjy-box kjy-flex-box VDOM" v-cloak>
+			<div class="kjy-title-box">
+				<div class="kjy-title-text">
+					客服管理
+				</div>
+			</div>
 			<div class="search-box">
-				<div class="search-text">
-					<div class="search">
-						<div class="search-name">来访姓名：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="accountName" placeholder="输入来访姓名" />
+				<div class="search-inner-box">
+					<div class="search-text">
+						<div class="search">
+							<div class="search-name">来访姓名：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="accountName" placeholder="输入来访姓名" />
+							</div>
 						</div>
-					</div>
-					<div class="search">
-						<div class="search-name">来访手机号：</div>
-						<div class="search-value">
-							<input type="text" name="" value="" id="accountTelephone" placeholder="输入来访手机号" />
+						<div class="search">
+							<div class="search-name">来访手机号：</div>
+							<div class="search-value">
+								<input type="text" name="" value="" id="accountTelephone" placeholder="输入来访手机号" />
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="btn-box">
-				<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
-				<div class="btn icon icon-search" onclick="sreach();">查询</div>
-				<div class="btn icon icon-del" onclick="del();">删除</div>
+				<div class="btn-inner-box">
+					<div class="btn icon icon-reload" onclick="reloadPage();">刷新</div>
+					<div class="btn icon icon-search" onclick="sreach();">查询</div>
+					<div class="btn icon icon-del" onclick="del();">删除</div>
+				</div>
 			</div>
-			<div class="kjy-data-box">
-				<div class="full-box" v-if="dataList.length == 0">
-					<div class="no-data-box">
-						<div class="icon icon-no-data"></div>
-						<div class="no-data-text">暂时没有客服消息哦</div>
-					</div>
+			<div class="no-data-box" v-if="dataList.length == 0">
+				<div class="no-data-inner-box">
+					<div class="icon icon-no-data"></div>
+					<div class="no-data-text">暂时没有客服消息哦</div>
 				</div>
-				<div class="kjy-table" v-else>
-					<table>
-						<thead>
-							<tr>
-								<th class="padding20">
-									<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
-								<th>来访姓名</th>
-								<th>来访手机号</th>
-								<th>来访地址</th>
-								<th>报修状态</th>
-								<th>创建时间</th>
-								<th>操作</th>
-							</tr>
-						</thead>
+			</div>
+			<div class="kjy-table" v-else>
+				<table>
+					<thead>
+						<tr>
+							<th class="padding20">
+								<div v-bind:class="['no-check',allisActive?'checked':'']" v-on:click="selectAllData()"></div>序号</th>
+							<th>来访姓名</th>
+							<th>来访手机号</th>
+							<th>来访地址</th>
+							<th>报修状态</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
 
-						<tbody id="tbody">
-							<tr v-for="(t,i) in dataList">
-								<td class="padding20">
-									<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
-								<td>{{t.accountName}}</td>
-								<td>{{t.accountTelephone}}</td>
-								<td>{{t.reportAddress}}</td>
-								<td>{{t.reportStateText}}</td>
-								<td>{{t.createTime}}</td>
-								<td>
-									<div class="btn icon icon-add" v-on:click="showMaintenance('',t,'新建报修')">新建报修</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+					<tbody id="tbody">
+						<tr v-for="(t,i) in dataList">
+							<td class="padding20">
+								<div v-bind:class="['no-check',t.isActive?'checked':'']" v-on:click="selectOneData(t)"></div>{{((currentPage-1)*20)+(i+1)}}</td>
+							<td>{{t.accountName}}</td>
+							<td>{{t.accountTelephone}}</td>
+							<td>{{t.reportAddress}}</td>
+							<td>{{t.reportStateText}}</td>
+							<td>{{t.createTime}}</td>
+							<td>
+								<div class="btn icon icon-add" v-on:click="showMaintenance('',t,'新建报修')">新建报修</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 			<div class="page-box"></div>
 		</div>
 	</body>
 	<script>
-		loadPage(function() {
-			loadData();
-		});
-
 		function showMaintenance(flag, obj, title) {
 			if(obj.reportState == "1") {
 				layer.msg("已报修，请勿重复操作");
@@ -159,6 +161,10 @@
 			//				layer.msg("活动加载失败");
 			//			})
 		}
+
+		loadPage(0, function() {
+			loadData();
+		});
 	</script>
 
 </html>

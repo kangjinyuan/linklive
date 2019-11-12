@@ -10,19 +10,19 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="css/reset.css" />
-		<link rel="stylesheet" href="css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="css/common.css?v=1c1ac2354f" />
 		<script src="js/jquery-1.9.1.min.js"></script>
 		<script src="js/echarts-all-3.js"></script>
 		<script src="layui/layui.all.js"></script>
 		<script src="js/vue.min.js"></script>
-		<script src="js/postUrl.js?v=2f85f2877b"></script>
-		<script src="js/common.js?v=e0666996b7"></script>
+		<script src="js/postUrl.js?v=62b1256164"></script>
+		<script src="js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
-		<div class="KJYBOX VDOM" v-cloak>
+		<div class="kjy-box VDOM" v-cloak>
 			<div class="chart-box">
 				<div class="chart-list-box chart-list-width-30 chart-list-person">
 					<div class="chart-list-inner-box">
@@ -196,8 +196,10 @@
 							<div class="chart-list-content chart-list-content-dynamic-box">
 								<div class="full-box" v-if="dataList.length == 0">
 									<div class="no-data-box">
-										<div class="icon icon-no-data"></div>
-										<div class="no-data-text">暂时没有社区动态哦</div>
+										<div class="no-data-inner-box">
+											<div class="icon icon-no-data"></div>
+											<div class="no-data-text">暂时没有社区动态哦</div>
+										</div>
 									</div>
 								</div>
 								<ul v-else class="chart-list-content-position-box chart-list-content-dynamic-inner-box">
@@ -254,7 +256,7 @@
 				if(feeTodayInfo.totalFee == 0) {
 					var onlineFeeRatio = 0;
 				} else {
-					var onlineFeeRatio = parseFloat(feeTodayInfo.totalOnlineFee) / parseFloat(feeTodayInfo.totalFee);
+					var onlineFeeRatio = parseFloat(feeTodayInfo.totalOnlineFee) / parseFloat(feeTodayInfo.totalFee) * 100;
 				}
 				feeTodayInfo.totalFee = feeTodayInfo.totalFee.toFixed(2);
 				feeTodayInfo.totalOnlineFee = feeTodayInfo.totalOnlineFee.toFixed(2);
@@ -382,7 +384,7 @@
 
 		function getDoorMaster() {
 			var param = {
-				pageSize: "10000"
+				pageSize: "1000"
 			}
 			request("POST", "/facility/doorMaster/queryList.do", param, true, function(res) {
 				setData.doorMasterList = res.data;
@@ -401,7 +403,7 @@
 			request('POST', '/statistics/doorGuard/record.do', param, isLoading, function(res) {
 				var dataList = res.data;
 				var dateArray = getAppointDate(7, 0);
-				var openingNumber = getIndexArray(dataList, 0, true);
+				var openingNumber = getIndexArray(dataList, 0, false);
 				var faceOpeningNumber = getIndexArray(dataList, 2, false);
 				var visitors = getIndexArray(dataList, 3, false);
 				doorGuardChart.setOption({
@@ -413,7 +415,7 @@
 					},
 					legend: {
 						bottom: '0',
-						data: ['开门数（次）', '人脸开门数（次）', '访客数（人）']
+						data: ['远程开门数（次）', '人脸开门数（次）', '访客数（人）']
 					},
 					grid: {
 						left: "30",
@@ -460,7 +462,7 @@
 						}
 					}],
 					series: [{
-						name: '开门数（次）',
+						name: '远程开门数（次）',
 						type: 'line',
 						symbol: "circle",
 						symbolSize: 8,

@@ -10,16 +10,16 @@
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
 		<meta http-equiv="Expires" content="0">
-		<link rel="shortcut icon" href="../img/logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../img/common/logo.png" type="image/x-icon" />
 		<link rel="stylesheet" href="../css/reset.css" />
-		<link rel="stylesheet" href="../css/common.css?v=ac68d45dc5" />
+		<link rel="stylesheet" href="../css/common.css?v=1c1ac2354f" />
 		<script src="../js/jquery-1.9.1.min.js"></script>
 		<script src="../layui/layui.all.js"></script>
 		<script src="../js/photoloadinit.js"></script>
 		<script src="../js/photoload.js"></script>
 		<script src="../js/vue.min.js"></script>
-		<script src="../js/postUrl.js?v=2f85f2877b"></script>
-		<script src="../js/common.js?v=e0666996b7"></script>
+		<script src="../js/postUrl.js?v=62b1256164"></script>
+		<script src="../js/common.js?v=fab245d574"></script>
 	</head>
 
 	<body>
@@ -35,7 +35,7 @@
 					<div class="mask-list-name"><span class="text">帖子图片：</div>
 					<div class="mask-list-value">
 						<div v-for="(image,i) in momentInfo.imageList" v-bind:class="['img-box',i == 5?'c_b':'',i > 4?'margin-top-small':'']">
-							<img v-bind:src="image" alt="" onerror="this.src='../img/no-img.png'" />
+							<img v-bind:src="image" alt="" onerror="this.src='../img/common/no-img.png'" />
 						</div>
 					</div>
 				</div>
